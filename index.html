@@ -1,74 +1,1960 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <!-- This viewport tag ensures it scales correctly on mobile devices -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BridgFunder London - Portal</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            background-color: #f4f7f6; 
-            margin: 0; 
-            padding: 20px; /* Gives breathing room on small screens */
-            box-sizing: border-box;
-        }
-        .container { 
-            text-align: center; 
-            padding: 40px 30px; 
-            background: white; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 100%; 
-            max-width: 450px; /* Keeps it looking sharp on desktop, shrinks on mobile */
-            box-sizing: border-box;
-        }
-        .logo {
-            max-width: 100%; /* Ensures the logo never overflows the box on a phone */
-            height: auto;
-            max-height: 120px; /* Prevents it from getting too tall */
-            margin-bottom: 20px;
-        }
-        h1 { 
-            color: #333; 
-            font-size: 1.5rem; 
-            margin-top: 0;
-        }
-        p {
-            color: #555;
-            font-size: 1rem;
-            margin-bottom: 30px;
-        }
-        .btn { 
-            display: inline-block; 
-            padding: 14px 28px; 
-            background-color: #0056b3; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 4px; 
-            font-weight: bold;
-            width: 100%; /* Makes the button full width for easy tapping on mobile */
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        .btn:hover { 
-            background-color: #004494; 
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>BridgFunder London Lead Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --navy: #0A192F;
+      --gold: #FFD700;
+      --white: #FFFFFF;
+      --bg-gray: #F4F7F6;
+      --text: #333;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg-gray); color: var(--text); }
+
+    #loginScreen {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: var(--bg-gray);
+      overflow: hidden;
+    }
+
+    #loginVideoContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      background: #000;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      max-width: none !important;
+    }
+
+    #loginVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(4px);
+      border-radius: 16px;
+      padding: 2.5rem;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    #appContent { display: none; }
+
+    .portal-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: var(--bg-gray);
+      padding: 1rem;
+      position: relative;
+    }
+    .portal-grid {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .portal-card {
+      background: white;
+      padding: 3rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 360px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+      border-top: 6px solid var(--navy);
+    }
+    .portal-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+    .portal-card.sme { border-top-color: var(--gold); }
+    .portal-card i { font-size: 3.5rem; margin-bottom: 1.5rem; color: var(--navy); }
+    .portal-card.sme i { color: var(--gold); }
+    .portal-card h2 { margin-bottom: 1rem; color: var(--navy); }
+    .portal-card p { color: #64748b; margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.5; }
+
+    header {
+      background-color: var(--navy);
+      color: var(--gold);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      flex-wrap: wrap;
+    }
+    .logo-container {
+      background: var(--white);
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      height: 45px;
+    }
+    .logo-container img { max-height: 100%; object-fit: contain; }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: var(--white);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-left: 1rem;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    nav button:hover { color: var(--gold); }
+    nav button.active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 4px; }
+
+    main { padding: 2rem; max-width: 1400px; margin: auto; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .dashboard-hero {
+      background: linear-gradient(rgba(10,25,47,0.82), rgba(10,25,47,0.88)),
+        url('https://raw.githubusercontent.com/henryromanenko-creator/site-assets/main/Development%20Finance.png') center/cover no-repeat;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .dashboard-hero h4 { color: #cbd5e1 !important; letter-spacing: 0.05em; }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.98);
+      padding: 1.25rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border-top: 4px solid var(--navy);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+    .card h3 { color: #64748b; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.4rem; font-weight: 700; }
+    .card .value { font-size: 2rem; font-weight: 700; color: var(--navy); }
+
+    .btn {
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-gold { background: var(--gold); color: var(--navy); }
+    .btn-outline { background: #ffffff; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-blue { background: #3b82f6; color: var(--white); }
+    .btn-red { background: #ef4444; color: var(--white); padding: 0.2rem 0.5rem; font-size:0.8rem; border-radius:4px; }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      align-items: center;
+      background: var(--white);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .filter-bar input, .filter-bar select {
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+
+    .table-container {
+      background: var(--white);
+      border-radius: 8px;
+      overflow-x: auto;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background-color: #f8fafc; color: #475569; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    tr:hover { background-color: #f1f5f9; }
+
+    .simple-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+    .simple-table th, .simple-table td { padding: 0.75rem 0.5rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    .simple-table th { font-weight: 700; color: var(--navy); }
+    .interactive-row { cursor: pointer; transition: background 0.15s; }
+    .interactive-row:hover { background-color: #f8fafc; color: #2563eb; }
+    .bar-bg { width: 100px; background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden; display: inline-block; margin-left: 10px; }
+    .bar-fill { background: #3b82f6; height: 100%; }
+
+    .badge {
+      padding: 0.25rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .bg-target { background: #dcfce7; color: #166534; }
+    .bg-review { background: #fef9c3; color: #854d0e; }
+    .bg-exclude { background: #fee2e2; color: #991b1b; }
+    .bg-sme { background: #f1f5f9; color: #334155; }
+    .badge-has-charges { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .badge-no-charges { background: #dcfce7; color: #166534; }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15,23,42,0.6);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(2px);
+    }
+    .modal-content {
+      background: #fff;
+      width: 95%;
+      max-width: 950px;
+      padding: 2rem;
+      border-radius: 12px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    .notes-box {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .social-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--navy);
+      margin-right: 5px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .social-icon-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+
+    .crm-input-group { margin-bottom: 0.75rem; }
+    .crm-input-group label { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 0.2rem; text-transform: uppercase; }
+    .crm-input-group input, .crm-input-group textarea {
+      width: 100%;
+      padding: 0.5rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .crm-input-group input:focus, .crm-input-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+    }
+
+    .security-asset-btn {
+      background: none;
+      border: none;
+      color: #3b82f6;
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-decoration: underline;
+      padding: 0;
+      margin: 0;
+    }
+    .security-asset-btn:hover { color: #1e40af; }
+
+    .template-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .template-card:hover { background: #f8fafc; }
+    .template-actions button { margin-left: 0.5rem; }
+
+    #chargesListContainer table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    #chargesListContainer th, #chargesListContainer td {
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    #chargesListContainer th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    #chargesListContainer .btn {
+      padding: 0.2rem 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0.75rem 1rem; }
+      header > div:first-child { margin-bottom: 0.5rem; }
+      nav { width: 100%; overflow-x: auto; flex-wrap: nowrap; gap: 0.25rem; }
+      nav button { margin-left: 0; font-size: 0.85rem; padding: 0.5rem 0.25rem; }
+      main { padding: 1rem; }
+      .dashboard-hero { padding: 1.5rem; }
+      .grid-4 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+      .card .value { font-size: 1.5rem; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .filter-bar input, .filter-bar select { width: 100%; }
+      .modal-content { padding: 1.5rem; width: 98%; }
+      .portal-card { width: 100%; max-width: 360px; }
+    }
+
+    @media (max-width: 480px) {
+      #loginScreen { padding: 0 0.5rem; }
+      .login-card { padding: 1.5rem; }
+      .login-card h2 { font-size: 1rem; }
+      .portal-screen { height: auto; min-height: 100vh; justify-content: flex-start; padding-top: 2rem; }
+      .portal-grid { gap: 1rem; }
+      .portal-card { padding: 2rem 1rem; }
+      .portal-card i { font-size: 2.5rem; }
+      header { flex-direction: column; align-items: flex-start; }
+      header > div:first-child { width: 100%; justify-content: center; margin-bottom: 0.5rem; }
+      #appTitle { font-size: 1rem !important; }
+      nav { flex-wrap: nowrap; justify-content: flex-start; }
+      nav button { font-size: 0.8rem; padding: 0.4rem 0.5rem; }
+      main { padding: 0.75rem; }
+      .dashboard-hero { padding: 1rem; }
+      .grid-4 { grid-template-columns: 1fr; gap: 0.75rem; }
+      .card { padding: 1rem; }
+      .card h3 { font-size: 0.7rem; }
+      .card .value { font-size: 1.2rem; }
+      .filter-bar { padding: 0.75rem; }
+      .btn { width: 100%; justify-content: center; padding: 0.5rem 0.75rem; font-size: 0.9rem; }
+      .modal-content { padding: 1rem; border-radius: 8px; }
+      .crm-input-group input, .crm-input-group textarea { font-size: 0.8rem; }
+      .table-container table { font-size: 0.8rem; }
+      th, td { padding: 0.6rem; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Using the raw GitHub link so the image actually loads -->
-        <img src="https://raw.githubusercontent.com/henryromanenko-creator/site-assets/main/Logo.png" alt="BridgFunder London Logo" class="logo">
-        
-        <h1>BridgFunder London</h1>
-        <p>Lead Management System</p>
-        
-        <a href="https://script.google.com/macros/s/AKfycbxY4lJJ6fcu2Y2HnIKbLVVsrfgTFTSADrpVd9-MKRVNTtIJizmCeasJwrF1hyi_IJ3f/exec" class="btn">Log In to Portal</a>
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen">
+    <div id="loginVideoContainer">
+      <video autoplay muted loop playsinline id="loginVideo">
+        <source src="https://raw.githubusercontent.com/henryromanenko-creator/site-assets/main/WebApp.mp4" type="video/mp4">
+      </video>
     </div>
+    <div class="login-card">
+      <div style="display:flex; align-items:center; justify-content:center; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div class="logo-container" style="height: 50px;">
+          <img src="https://raw.githubusercontent.com/henryromanenko-creator/site-assets/main/Logo.png" alt="BridgFunder Logo">
+        </div>
+        <h2 style="color:#0A192F; margin: 0; font-size: 1.15rem; text-align:center;">BridgFunder London Lead Management</h2>
+      </div>
+      <p style="color:#666; margin-bottom: 1.5rem; font-size: 0.9rem;">Please enter your password to access the system.</p>
+      <input type="password" id="passwordInput" placeholder="Enter password" style="width:100%; padding:0.75rem; border:1px solid #ddd; border-radius:4px; margin-bottom:1rem;">
+      <button onclick="verifyPassword()" class="btn" style="width:100%; padding:0.75rem; font-size: 1rem; justify-content:center; background: var(--navy);">Login</button>
+      <div id="loginError" style="color:#e74c3c; display:none; margin-top:1rem; font-weight: 600; font-size: 0.9rem;">❌ Incorrect password. Please try again.</div>
+    </div>
+  </div>
+
+  <!-- PORTAL SELECTION -->
+  <div id="portalScreen" class="portal-screen" style="display:none;">
+    <div style="position:absolute; top:20px; right:20px;">
+      <button class="btn btn-outline" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+    <div class="logo-container" style="height: 60px; margin-bottom: 1.5rem;">
+      <img src="https://raw.githubusercontent.com/henryromanenko-creator/site-assets/main/Logo.png" alt="BridgFunder Logo">
+    </div>
+    <h1 style="color: var(--navy); margin-bottom: 0.5rem; font-size: 1.5rem; text-align:center;">BridgFunder London Lead Management</h1>
+    <p style="color: #64748b; margin-bottom: 2rem;">Select Finance Portal</p>
+    <div class="portal-grid">
+      <div class="portal-card" onclick="enterPortal('prop')">
+        <i class="fa-solid fa-city"></i>
+        <h2>Property Finance</h2>
+        <p>Manage Commercial Developers, Landlords, and Real Estate acquisitions.</p>
+        <button class="btn btn-blue" style="width: 100%; justify-content: center;">Enter Property Hub</button>
+      </div>
+      <div class="portal-card sme" onclick="enterPortal('sme')">
+        <i class="fa-solid fa-store"></i>
+        <h2>SME Finance</h2>
+        <p>Manage Trading Businesses across Hospitality, Manufacturing, Retail & Construction.</p>
+        <button class="btn btn-gold" style="width: 100%; justify-content: center;">Enter SME Hub</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="appContent">
+    <header>
+      <div style="display:flex; align-items:center; gap: 0.75rem;">
+        <div class="logo-container"><img src="https://raw.githubusercontent.com/henryromanenko-creator/site-assets/main/Logo.png" alt="BridgFunder Logo"></div>
+        <h2 id="appTitle" style="font-size: 1.2rem; font-weight: 700; margin: 0; letter-spacing: 0.5px;">BridgFunder London Lead Management</h2>
+      </div>
+
+      <nav id="nav-prop" style="display:none;">
+        <button class="nav-btn active" onclick="switchView('prop-dashboard', this)">Dashboard</button>
+        <button class="nav-btn" onclick="switchView('prop-leads', this)">Property Leads</button>
+        <button class="nav-btn" onclick="switchView('prop-charges', this)">Charge Database</button>
+        <button class="nav-btn" onclick="switchView('prop-analysis', this)"><i class="fa-solid fa-chart-pie"></i> Analysis</button>
+        <button class="nav-btn" onclick="switchView('outreach-hub', this)"><i class="fa-solid fa-paper-plane"></i> Outreach Hub</button>
+        <button class="nav-btn" onclick="showPortalHub()"><i class="fa-solid fa-grid-2"></i> Switch Portal</button>
+        <button class="nav-btn" onclick="logout()" style="color: #ef4444;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </nav>
+
+      <nav id="nav-sme" style="display:none;">
+        <button class="nav-btn active" onclick="switchView('sme-dashboard', this)">SME Dashboard</button>
+        <button class="nav-btn" onclick="switchView('sme-leads', this)">SME Database</button>
+        <button class="nav-btn" onclick="switchView('sme-analysis', this)"><i class="fa-solid fa-chart-pie"></i> Analysis</button>
+        <button class="nav-btn" onclick="switchView('outreach-hub', this)"><i class="fa-solid fa-paper-plane"></i> Outreach Hub</button>
+        <button class="nav-btn" onclick="showPortalHub()"><i class="fa-solid fa-grid-2"></i> Switch Portal</button>
+        <button class="nav-btn" onclick="logout()" style="color: #ef4444;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- OUTREACH HUB -->
+      <section id="outreach-hub" class="view">
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="color: var(--navy); margin-bottom: 0.2rem;"><i class="fa-solid fa-paper-plane"></i> Outreach & Contact Engine</h2>
+            <p style="color: #64748b; font-size: 0.9rem;">Review Top 100 targets, resolve SPVs to find active decision-makers, and send live campaigns.</p>
+          </div>
+          <button class="btn btn-outline" onclick="fetchOutreachTargets()"><i class="fa-solid fa-rotate-right"></i> Refresh List</button>
+        </div>
+        
+        <!-- OUTREACH FILTER BAR -->
+        <div class="filter-bar">
+          <input type="text" id="outreachSearchInput" placeholder="Search..." style="flex: 2; min-width: 200px;" onkeyup="applyOutreachFilters()">
+          <select id="outreachSearchColumn" style="flex: 1; min-width: 160px;" onchange="applyOutreachFilters()">
+            <option value="all">All Columns</option>
+            <option value="targetCompany">Target Company</option>
+            <option value="sectorType">Sector / Type</option>
+            <option value="contactName">Contact Name</option>
+            <option value="emailAddress">Email Address</option>
+            <option value="verifiedSocial">Verified Social & Web</option>
+            <option value="pipelineStatus">Pipeline Status</option>
+          </select>
+        </div>
+
+        <div class="card" style="border-top-color: var(--navy); margin-bottom: 2rem; cursor:default;">
+          <div style="background: #f8fafc; border: 1px solid var(--border); padding: 1.25rem; border-radius: 8px; display:flex; justify-content: space-between; align-items:center; flex-wrap: wrap; gap: 1rem;">
+            <div style="display:flex; gap: 1rem; align-items:center; flex-wrap: wrap;">
+              <button class="btn btn-gold" id="btnRunContacts" onclick="startOutreachContactSearch()"><i class="fa-solid fa-magnifying-glass"></i> Extract Contacts (Strict API Mode)</button>
+              <button class="btn btn-blue" onclick="openEmailDesigner()"><i class="fa-solid fa-envelope-open-text"></i> Email Campaign Designer</button>
+            </div>
+            <span style="font-size: 0.85rem; color:#64748b;"><i class="fa-solid fa-shield-halved" style="color:#22c55e;"></i> Authenticated via IONOS</span>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="outreachTable">
+            <thead>
+              <tr>
+                <th style="width: 40px;"><input type="checkbox" onchange="toggleAllOutreachContacts(this)"></th>
+                <th>Target Company</th>
+                <th>Sector / Type</th>
+                <th>Contact Name</th>
+                <th>Email Address</th>
+                <th>Verified Social & Web</th>
+                <th>Pipeline Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PROPERTY DASHBOARD -->
+      <section id="prop-dashboard" class="view active">
+        <div class="dashboard-hero">
+          <div style="display:flex; gap: 1rem; margin-bottom: 2rem; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-gold" onclick="fullSync()"><i class="fa-solid fa-rotate-right"></i> Sync Database</button>
+            <button class="btn" onclick="triggerSearch()"><i class="fa-solid fa-search"></i> Run New Search</button>
+            <button class="btn btn-blue" id="btnEnrich" onclick="triggerDeepEnrich()"><i class="fa-solid fa-wand-magic-sparkles"></i> Deep Enrich 15 Leads</button>
+            <button class="btn btn-outline" onclick="batchRefresh()"><i class="fa-solid fa-sync"></i> Refresh Existing Records</button>
+          </div>
+
+          <h4 style="margin-bottom: 0.75rem; text-transform: uppercase;">Property Database Overview</h4>
+          <div class="grid-4">
+            <div class="card" style="border-top-color: var(--navy);" onclick="jumpToFilter('prop-leads', 'ALL', 'ALL')"><h3>Total Property Leads</h3><div class="value" id="stat-total">0</div></div>
+            <div class="card" style="border-top-color: #22c55e;" onclick="jumpToFilter('prop-leads', 'class', 'Developer')"><h3>Developers</h3><div class="value" id="stat-dev">0</div></div>
+            <div class="card" style="border-top-color: #3b82f6;" onclick="jumpToFilter('prop-leads', 'class', 'Landlord')"><h3>Landlords</h3><div class="value" id="stat-land">0</div></div>
+            <div class="card" style="border-top-color: #ef4444;" onclick="jumpToFilter('prop-leads', 'charges', 'HAS_CHARGES')"><h3>Leads With Active Charges</h3><div class="value" id="stat-charges">0</div></div>
+          </div>
+
+          <h4 style="margin-bottom: 0.75rem; text-transform: uppercase;">Sector Intelligence</h4>
+          <div class="grid-4">
+            <div class="card" style="border-top-color: #22c55e;" onclick="jumpToFilter('prop-leads', 'sector', 'TARGET')"><h3>Target Leads</h3><div class="value" id="stat-target">0</div></div>
+            <div class="card" style="border-top-color: #f39c12;" onclick="jumpToFilter('prop-leads', 'sector', 'REVIEW')"><h3>Review Leads</h3><div class="value" id="stat-review">0</div></div>
+            <div class="card" style="border-top-color: #e74c3c;" onclick="jumpToFilter('prop-leads', 'sector', 'EXCLUDE')"><h3>Exclude Leads</h3><div class="value" id="stat-exclude">0</div></div>
+            <div class="card" style="cursor: default; pointer-events: none;"><h3>Last Sync</h3><div class="value" id="stat-updated" style="font-size:1.4rem; margin-top:0.4rem;">Never</div></div>
+          </div>
+
+          <h4 style="margin-bottom: 0.75rem; text-transform: uppercase;">Charge Document Intelligence</h4>
+          <div class="grid-4" style="margin-bottom: 0;">
+            <div class="card" style="border-top-color: var(--navy);" onclick="jumpToFilter('prop-charges', 'ALL', 'ALL')"><h3>Total Indexed Charges</h3><div class="value" id="stat-charge-total">0</div></div>
+            <div class="card" style="border-top-color: #ef4444;" onclick="jumpToFilter('prop-charges', 'status', 'OUTSTANDING')"><h3>Active Charges</h3><div class="value" id="stat-charge-active">0</div></div>
+            <div class="card" style="border-top-color: #22c55e;" onclick="jumpToFilter('prop-charges', 'property', 'TRUE')"><h3>Property Charges</h3><div class="value" id="stat-charge-prop">0</div></div>
+            <div class="card" style="border-top-color: #f39c12;" onclick="jumpToFilter('prop-charges', 'ALL', 'ALL')"><h3>Companies With Charges</h3><div class="value" id="stat-charge-comps">0</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROPERTY LEADS -->
+      <section id="prop-leads" class="view">
+        <div class="filter-bar">
+          <input type="text" id="searchInput" placeholder="Search Company..." style="flex: 2;" onkeyup="applyPropFilters()">
+          <select id="filterSector" style="flex: 1;" onchange="applyPropFilters()"><option value="ALL">All Sectors</option><option value="TARGET">Target Only</option><option value="REVIEW">Needs Review</option><option value="EXCLUDE">Excluded</option></select>
+          <select id="filterClass" style="flex: 1;" onchange="applyPropFilters()"><option value="ALL">All Classifications</option><option value="Developer">Developer</option><option value="Landlord">Landlord</option></select>
+          <select id="filterCharges" style="flex: 1;" onchange="applyPropFilters()"><option value="ALL">All Charges Statuses</option><option value="HAS_CHARGES">⚠️ Has Active Charges</option><option value="NO_CHARGES">✅ No Active Charges</option></select>
+          <button class="btn btn-outline" onclick="exportCSV()"><i class="fa-solid fa-download"></i> Export CSV</button>
+        </div>
+        <div class="table-container">
+          <table id="leadsTable"><thead><tr><th>Company</th><th>Suitability</th><th>Classification</th><th>Active Charges</th><th>Pipeline Status</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- CHARGE DATABASE -->
+      <section id="prop-charges" class="view">
+        <div class="filter-bar">
+          <input type="text" id="chargeSearchInput" placeholder="Search Company or Lender..." style="flex: 2; min-width: 220px;" onkeyup="applyChargeFilters()">
+          <select id="chargeFilterStatus" style="flex: 1; min-width: 140px;" onchange="applyChargeFilters()"><option value="ALL">All Statuses</option><option value="OUTSTANDING">Outstanding</option><option value="SATISFIED">Satisfied</option></select>
+          <select id="chargeFilterType" style="flex: 1; min-width: 140px;" onchange="applyChargeFilters()"><option value="ALL">All Classifications</option><option value="PROPERTY">Property Charge</option><option value="DEBENTURE">Debenture</option><option value="ASSET">Floating/Asset</option></select>
+        </div>
+        <div class="table-container">
+          <table id="chargesTable"><thead><tr><th>Company</th><th>Reg. Date</th><th>Lender</th><th>Classification</th><th>Security Asset</th><th>Status</th><th>Document</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- PROPERTY ANALYSIS -->
+      <section id="prop-analysis" class="view">
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <div><h2 style="color: var(--navy); margin-bottom: 0.2rem;"><i class="fa-solid fa-chart-pie"></i> Charges Intelligence Summary</h2></div>
+          <button class="btn btn-outline" onclick="renderPropAnalysis()"><i class="fa-solid fa-rotate-right"></i> Refresh Analysis</button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+          <div class="card" style="border-top-color: var(--navy); cursor: default;">
+            <div style="display: flex; justify-content: space-between; align-items: center;"><h3 id="lenderTableTitle"><i class="fa-solid fa-building-columns"></i> Top 10 Active Lenders</h3></div>
+            <div style="max-height: 420px; overflow-y: auto;"><table class="simple-table" id="tableLenders"><thead><tr><th>Lender Name</th><th>Active Charges</th><th></th></tr></thead><tbody></tbody></table></div>
+            <button id="btnToggleLenders" class="btn btn-outline" style="margin-top: 1rem; width: 100%; justify-content: center; font-size: 0.85rem;" onclick="toggleLendersView()"><i class="fa-solid fa-list-ul"></i> View All Lenders</button>
+          </div>
+          <div class="card" style="border-top-color: #3b82f6; cursor: default;"><h3><i class="fa-solid fa-map-location-dot"></i> Regional Distribution</h3><div style="max-height: 470px; overflow-y: auto;"><table class="simple-table" id="tableRegions"><thead><tr><th>Region</th><th>Companies</th><th></th></tr></thead><tbody></tbody></table></div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <div class="card" style="border-top-color: #22c55e; cursor: default;"><h3><i class="fa-solid fa-layer-group"></i> Active Charge Types</h3><table class="simple-table" id="tableTypes"><thead><tr><th>Classification</th><th>Count</th><th></th></tr></thead><tbody></tbody></table></div>
+          <div class="card" style="border-top-color: #f39c12; cursor: default;"><h3><i class="fa-solid fa-clock-rotate-left"></i> Age of Outstanding Debt</h3><table class="simple-table" id="tableAge"><thead><tr><th>Registered</th><th>Volume</th><th></th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- SME DASHBOARD -->
+      <section id="sme-dashboard" class="view">
+        <div style="display:flex; gap: 1rem; margin-bottom: 2rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-gold" onclick="fullSync()"><i class="fa-solid fa-rotate-right"></i> Sync Database</button>
+          <button class="btn" id="btnSmeSearch" onclick="triggerSmeSearch()"><i class="fa-solid fa-search"></i> Run New SME Search</button>
+          <button class="btn btn-blue" id="btnSmeEnrich" onclick="triggerDeepSmeEnrich()"><i class="fa-solid fa-wand-magic-sparkles"></i> Deep Enrich 15 SMEs</button>
+        </div>
+        <h4 style="margin-bottom: 0.75rem; text-transform: uppercase;">SME Intelligence Overview</h4>
+        <div class="grid-4">
+          <div class="card" style="border-top-color: var(--navy);" onclick="jumpToFilter('sme-leads', 'ALL', 'ALL')"><h3>Total Sourced SMEs</h3><div class="value" id="sme-stat-total">0</div></div>
+          <div class="card" style="border-top-color: #22c55e;" onclick="jumpToFilter('sme-leads', 'priority', 'High')"><h3>High Priority (Funding)</h3><div class="value" id="sme-stat-high">0</div></div>
+          <div class="card" style="border-top-color: #f39c12;" onclick="jumpToFilter('sme-leads', 'priority', 'Medium')"><h3>Medium Priority</h3><div class="value" id="sme-stat-med">0</div></div>
+          <div class="card" style="border-top-color: #ef4444;" onclick="jumpToFilter('sme-leads', 'accounts', 'Overdue')"><h3>Accounts Overdue</h3><div class="value" id="sme-stat-overdue">0</div></div>
+        </div>
+      </section>
+
+      <!-- SME LEADS -->
+      <section id="sme-leads" class="view">
+        <div class="filter-bar">
+          <input type="text" id="smeSearchInput" placeholder="Search SME Company..." style="flex: 2; min-width: 200px;" onkeyup="applySmeFilters()">
+          <select id="smeFilterSector" style="flex: 1; min-width: 130px;" onchange="applySmeFilters()"><option value="ALL">All Sectors</option><option value="Manufacturing">Manufacturing</option><option value="Retail">Retail</option><option value="Hospitality">Hospitality</option><option value="Construction">Construction</option></select>
+          <select id="smeFilterPriority" style="flex: 1; min-width: 120px;" onchange="applySmeFilters()"><option value="ALL">All Priorities</option><option value="High">High Score (50+)</option><option value="Medium">Medium Score (30-49)</option><option value="Low">Low Score (<30)</option></select>
+          <select id="smeFilterAccounts" style="flex: 1; min-width: 120px;" onchange="applySmeFilters()"><option value="ALL">Account Status</option><option value="Up to date">Up to date</option><option value="Overdue">Overdue</option></select>
+          <button class="btn btn-outline" onclick="exportSmeCSV()"><i class="fa-solid fa-download"></i> Export CSV</button>
+        </div>
+        <div class="table-container">
+          <table id="smeTable"><thead><tr><th>Company</th><th>SME Sector</th><th>Trading</th><th>Funding Score</th><th>Accounts</th><th>Pipeline Status</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <!-- SME ANALYSIS -->
+      <section id="sme-analysis" class="view">
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <div><h2 style="color: var(--navy); margin-bottom: 0.2rem;"><i class="fa-solid fa-chart-pie"></i> SME Intelligence Summary</h2></div>
+          <button class="btn btn-outline" onclick="renderSmeAnalysis()"><i class="fa-solid fa-rotate-right"></i> Refresh Analysis</button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+          <div class="card" style="border-top-color: var(--gold); cursor: default;"><h3><i class="fa-solid fa-industry"></i> SME Sector Breakdown</h3><table class="simple-table" id="tableSmeSector"><thead><tr><th>Sector</th><th>Companies</th><th></th></tr></thead><tbody></tbody></table></div>
+          <div class="card" style="border-top-color: #22c55e; cursor: default;"><h3><i class="fa-solid fa-gauge-high"></i> Funding Likelihood Distribution</h3><table class="simple-table" id="tableSmeScore"><thead><tr><th>Priority Tier</th><th>Volume</th><th></th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODALS -->
+  <!-- EMAIL COMPOSER MODAL -->
+  <div id="emailModal" class="modal" style="z-index: 120;">
+    <div class="modal-content" style="max-width: 800px;">
+      <h2 style="color:var(--navy); margin-bottom: 0.3rem;"><i class="fa-solid fa-envelope-open-text"></i> Email Campaign Designer</h2>
+      <p style="color:#64748b; font-size:0.85rem; margin-bottom: 1.25rem;">Sender: <strong>Henry Romanenko | BridgFunder London</strong> (contact@bridgfunderlondon.co.uk)</p>
+      <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid var(--navy); padding: 1rem; border-radius: 6px; margin-bottom: 1.25rem;">
+        <span style="font-size: 0.75rem; font-weight: 700; color: var(--navy); text-transform: uppercase; display: block; margin-bottom: 0.3rem;"><i class="fa-solid fa-flask"></i> Email Delivery Sandbox</span>
+        <div style="display:flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <input type="email" id="testEmailRecipient" value="contact@bridgfunderlondon.co.uk" placeholder="Enter recipient email..." style="flex: 2; min-width: 200px; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem;">
+          <button class="btn btn-outline" id="btnSendTest" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="sendTestEmailPreview()"><i class="fa-solid fa-paper-plane"></i> Send Live Test</button>
+        </div>
+      </div>
+      <div style="display:flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 150px;"><label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:0.3rem;">Selected Targets</label><input type="text" id="emailRecipientCount" readonly value="0 Leads Selected" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px; background:#f8fafc; font-weight: 600;"></div>
+        <div style="flex: 1; min-width: 200px; display:flex; flex-direction: column; gap:0.3rem;"><label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:0.3rem;">Load Template</label><select id="emailTemplateSelect" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px;" onchange="loadEmailTemplate()"><option value="">-- Start Blank --</option></select><div style="display:flex; gap:0.5rem;"><button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openTemplateManager()"><i class="fa-solid fa-gear"></i> Manage</button><button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="saveAsTemplate()"><i class="fa-solid fa-save"></i> Save as Template</button></div></div>
+      </div>
+      <div style="margin-bottom: 1rem;"><label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:0.3rem;">Subject Line</label><input type="text" id="emailSubject" placeholder="Enter subject line..." style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"></div>
+      <div style="margin-bottom: 1.25rem;"><label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:0.3rem;">Email Body (HTML supported)</label><textarea id="emailBody" rows="10" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px; font-family: monospace; font-size: 0.85rem;" placeholder="Write your email here..."></textarea></div>
+      <div style="display:flex; justify-content: flex-end; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <button class="btn btn-outline" onclick="previewEmailTemplate()"><i class="fa-solid fa-eye"></i> Preview Email</button>
+        <div id="emailSendingLoader" style="display:none; color:var(--navy); font-size: 0.9rem;"><i class="fa-solid fa-spinner fa-spin"></i> Dispatching emails...</div>
+        <button class="btn btn-outline" onclick="document.getElementById('emailModal').style.display='none'">Cancel</button>
+        <button class="btn btn-blue" id="btnSendEmails" onclick="sendCampaignEmails()"><i class="fa-solid fa-paper-plane"></i> Launch Live Campaign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL PREVIEW MODAL -->
+  <div id="emailPreviewModal" class="modal" style="z-index: 140;">
+    <div class="modal-content" style="max-width: 800px;">
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="color:var(--navy); font-size: 1.3rem;"><i class="fa-solid fa-envelope-open"></i> Email Preview</h2>
+        <button class="btn btn-outline" onclick="document.getElementById('emailPreviewModal').style.display='none'"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+      <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+        <iframe id="emailPreviewFrame" style="width:100%; height: 600px; border: none;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRILLDOWN MODAL -->
+  <div id="drilldownModal" class="modal" style="z-index: 105;">
+    <div class="modal-content" style="max-width: 1000px;">
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;"><div><h2 id="drillTitle" style="color:var(--navy); font-size: 1.4rem;">Drilldown Category</h2><p id="drillSubtitle" style="color:#64748b; font-size: 0.9rem; margin-top: 0.2rem;">Showing matching companies</p></div><button class="btn btn-outline" onclick="closeDrilldownModal()"><i class="fa-solid fa-xmark"></i> Close</button></div>
+      <div class="table-container" style="max-height: 480px; overflow-y: auto;"><table id="drilldownTable"><thead><tr id="drilldownHeader"><th>Company</th><th>Detail 1</th><th>Detail 2</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- CHARGE DESCRIPTION MODAL -->
+  <div id="chargeDescriptionModal" class="modal" style="z-index: 115;">
+    <div class="modal-content" style="max-width: 800px;">
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;"><h2 style="color:var(--navy); font-size: 1.3rem;"><i class="fa-solid fa-file-shield"></i> Charge Security Details</h2><button class="btn btn-outline" onclick="closeChargeDescriptionModal()"><i class="fa-solid fa-xmark"></i> Close</button></div>
+      <div id="chargeDescriptionContent"></div>
+    </div>
+  </div>
+
+  <!-- COMPANY DETAIL MODAL -->
+  <div id="detailModal" class="modal" style="z-index: 110;">
+    <div class="modal-content">
+      <div style="display:flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;"><div><h2 id="detName" style="color:var(--navy); margin-bottom: 0.3rem; font-size: 1.5rem;">Company Name</h2><p style="color:#64748b; font-size:0.9rem;">No. <span id="detNumber"></span> | <span id="detSector" class="badge"></span></p></div><div style="display:flex; gap: 0.5rem;" id="detSocialButtons"></div></div>
+      <h3 style="border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; font-size: 1rem; margin-bottom: 0.75rem; color:var(--navy);"><i class="fa-solid fa-address-card"></i> Contact & Social Profiles</h3>
+      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="crm-input-group"><label>Contact Name / Decision Maker</label><input type="text" id="editContactName" placeholder="E.g. John Smith"></div>
+          <div class="crm-input-group"><label>Email Address</label><input type="email" id="editContactEmail" placeholder="name@company.com"></div>
+          <div class="crm-input-group"><label><i class="fa-solid fa-phone" style="color:#64748b;"></i> Phone Number</label><input type="tel" id="editPhone" placeholder="+44 ..."></div>
+          <div class="crm-input-group"><label><i class="fa-solid fa-globe" style="color:#64748b;"></i> Website URL</label><input type="url" id="editWebsite" placeholder="https://www..."></div>
+          <div class="crm-input-group"><label><i class="fa-brands fa-linkedin" style="color:#0a66c2;"></i> LinkedIn</label><input type="url" id="editLinkedin" placeholder="https://linkedin.com/..."></div>
+          <div class="crm-input-group"><label><i class="fa-brands fa-instagram" style="color:#e1306c;"></i> Instagram</label><input type="url" id="editInstagram" placeholder="https://instagram.com/..."></div>
+          <div class="crm-input-group"><label><i class="fa-brands fa-tiktok" style="color:#000000;"></i> TikTok</label><input type="url" id="editTiktok" placeholder="https://tiktok.com/..."></div>
+          <div class="crm-input-group"><label><i class="fa-brands fa-x-twitter" style="color:#000000;"></i> X (Twitter)</label><input type="url" id="editX" placeholder="https://x.com/..."></div>
+          <div class="crm-input-group"><label><i class="fa-brands fa-facebook" style="color:#1877f2;"></i> Facebook</label><input type="url" id="editFacebook" placeholder="https://facebook.com/..."></div>
+          <div class="crm-input-group"><label><i class="fa-brands fa-youtube" style="color:#ff0000;"></i> YouTube</label><input type="url" id="editYoutube" placeholder="https://youtube.com/..."></div>
+        </div>
+      </div>
+      <div class="notes-box" id="detNotes">Compliance & Risk Markers will appear here.</div>
+      <div style="display:flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;"><button class="btn btn-outline" onclick="generateAI()"><i class="fa-solid fa-robot"></i> Generate Company Brief</button><button class="btn btn-outline" onclick="refreshSingleCompany()"><i class="fa-solid fa-sync"></i> Refresh Company Data</button></div>
+      <h3 style="border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; font-size: 1rem; margin-bottom: 0.75rem; color:var(--navy);"><i class="fa-solid fa-handcuffs"></i> Charges</h3>
+      <div id="chargesListContainer" style="margin-bottom: 0.75rem;"><p>Loading charges...</p></div>
+      <button class="btn btn-blue" onclick="openChargeForm(null)" style="margin-bottom: 1rem;"><i class="fa-solid fa-plus"></i> Add Charge</button>
+      <h3 style="border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; font-size: 1rem; margin-bottom: 0.75rem; color:var(--navy);"><i class="fa-solid fa-folder-open"></i> Recent Filings & Documents (Companies House)</h3>
+      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;"><div id="filingsListContent">Loading...</div></div>
+      <h3 style="border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; font-size: 1rem; margin-bottom: 0.75rem; color:var(--navy);"><i class="fa-solid fa-comments"></i> Outreach, Notes & File Uploads</h3>
+      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+        <div style="display:flex; gap:1rem; margin-bottom: 1rem; align-items: start; flex-wrap: wrap;"><textarea id="newLogNote" rows="2" style="flex:2; min-width: 250px; padding:0.6rem; border:1px solid var(--border); border-radius:6px; font-size:0.85rem;" placeholder="Type phone notes, email summaries, or interactions here..."></textarea><div style="flex:1; min-width: 200px;"><input type="file" id="fileUpload" style="font-size:0.8rem; margin-bottom:0.5rem; width:100%; border: 1px dashed #cbd5e1; padding: 0.4rem; border-radius: 4px; background: white;" accept=".pdf,image/*"><button class="btn btn-blue" id="btnUploadFile" onclick="saveInteractionLog()" style="width:100%; justify-content:center; padding:0.5rem; font-size:0.8rem;"><i class="fa-solid fa-upload"></i> Save Note & Upload</button></div></div>
+        <div id="interactionFeed" style="max-height:160px; overflow-y:auto; border-top: 1px solid var(--border); padding-top: 0.5rem; font-size: 0.85rem; color: #475569;"><p><i class="fa-solid fa-spinner fa-spin"></i> Loading history...</p></div>
+      </div>
+      <hr style="border:0; border-top:1px solid var(--border); margin:1.5rem 0;">
+      <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;"><input type="hidden" id="detId"><input type="hidden" id="detIsSme"><div class="form-group" style="flex:1; min-width: 120px;"><label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:0.3rem;">Pipeline Status</label><select id="editStatus" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"><option value="New">New</option><option value="Contacted">Contacted</option><option value="In Progress">In Progress</option><option value="Converted">Converted</option><option value="Dead">Dead</option></select></div><div class="form-group" style="flex:1; min-width: 120px;"><label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:0.3rem;">Follow-up Date</label><input type="date" id="editFollow" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px;"></div><button class="btn btn-gold" onclick="saveLeadUpdates()" id="btnSaveCrm" style="margin-bottom: 0; padding: 0.65rem 2rem;">Save CRM Record</button></div>
+      <div style="text-align: right; margin-top: 1rem;"><button class="btn btn-outline" style="color: #ef4444; border-color: #fca5a5;" onclick="closeModal()">Close Window</button></div>
+    </div>
+  </div>
+
+  <!-- CHARGE FORM MODAL -->
+  <div id="chargeFormModal" class="modal" style="z-index: 125;">
+    <div class="modal-content" style="max-width: 700px;">
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;"><h2 id="chargeFormTitle" style="color:var(--navy); font-size: 1.3rem;">Add Charge</h2><button class="btn btn-outline" onclick="closeChargeForm()"><i class="fa-solid fa-xmark"></i> Close</button></div>
+      <div class="crm-input-group"><label>Registration Date</label><input type="date" id="chargeRegDate"></div>
+      <div class="crm-input-group"><label>Lender</label><input type="text" id="chargeLender" placeholder="e.g. National Westminster Bank PLC"></div>
+      <div class="crm-input-group"><label>Classification</label><input type="text" id="chargeClassification" placeholder="e.g. Property Charge, Debenture, etc."></div>
+      <div class="crm-input-group"><label>Brief Description / Security Asset</label><textarea id="chargeBriefDesc" rows="3" placeholder="Brief description of the charge..."></textarea></div>
+      <div class="crm-input-group"><label>PDF Link</label><input type="url" id="chargePdfLink" placeholder="https://..."></div>
+      <div class="crm-input-group"><label>Charge Link (Companies House)</label><input type="url" id="chargeLink" placeholder="https://find-and-update.company-information.service.gov.uk/company/.../charges/..."></div>
+      <input type="hidden" id="chargeIdInput">
+      <div style="display:flex; justify-content: flex-end; gap: 1rem;"><button class="btn btn-outline" onclick="closeChargeForm()">Cancel</button><button class="btn btn-blue" onclick="saveChargeForm()"><i class="fa-solid fa-save"></i> Save Charge</button></div>
+    </div>
+  </div>
+
+  <!-- TEMPLATE MANAGER MODAL -->
+  <div id="templateManagerModal" class="modal" style="z-index: 130;">
+    <div class="modal-content" style="max-width: 900px;">
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;"><h2 style="color:var(--navy); font-size: 1.3rem;"><i class="fa-solid fa-envelope-open-text"></i> Email Template Manager</h2><button class="btn btn-outline" onclick="closeTemplateManager()"><i class="fa-solid fa-xmark"></i> Close</button></div>
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;"><h3>Available Templates</h3><button class="btn btn-blue" onclick="openTemplateForm(null)"><i class="fa-solid fa-plus"></i> Add New Template</button></div>
+      <div id="templateListContainer"></div>
+    </div>
+  </div>
+
+  <!-- TEMPLATE FORM MODAL -->
+  <div id="templateFormModal" class="modal" style="z-index: 135;">
+    <div class="modal-content" style="max-width: 700px;">
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;"><h2 id="templateFormTitle" style="color:var(--navy); font-size: 1.3rem;">Add New Template</h2><button class="btn btn-outline" onclick="closeTemplateForm()"><i class="fa-solid fa-xmark"></i> Close</button></div>
+      <div class="crm-input-group"><label>Template Name</label><input type="text" id="templateNameInput" placeholder="E.g. SME Funding Pitch"></div>
+      <div class="crm-input-group"><label>Subject Line</label><input type="text" id="templateSubjectInput" placeholder="Email subject..."></div>
+      <div class="crm-input-group"><label>Email Body (HTML supported)</label><textarea id="templateBodyInput" rows="10" placeholder="Write your email template..."></textarea></div>
+      <input type="hidden" id="templateIdInput">
+      <div style="display:flex; justify-content: flex-end; gap: 1rem;"><button class="btn btn-outline" onclick="closeTemplateForm()">Cancel</button><button class="btn btn-blue" onclick="saveTemplateFromForm()"><i class="fa-solid fa-save"></i> Save Template</button></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" style="visibility: hidden; background:var(--navy); color:var(--gold); padding:1rem; position:fixed; bottom:20px; right:20px; border-radius:6px; z-index:999;">Message</div>
+
+  <script>
+    window.onerror = function(message) { console.error("Error:", message); };
+    var CORRECT_PASSWORD = "BridgFunder2026";
+    var globalLeads = []; var globalCharges = []; var globalSMEs = []; var globalTargets = [];
+    var currentPortal = ''; var searchQueue = []; var searchIsRunning = false; var showAllLenders = false;
+    let currentTemplates = [];
+    let currentEditingTemplateId = null;
+    let currentChargesForCompany = [];
+    let currentEditingChargeId = null;
+
+    // Persistent login check + initial data load
+    (function() {
+      if (localStorage.getItem('bfLoggedIn') === 'true') {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('portalScreen').style.display = 'flex';
+        fullSync();
+      } else {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('portalScreen').style.display = 'none';
+      }
+    })();
+
+    function escJsAndHtml(value) {
+      if (value === null || value === undefined) return '';
+      return String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,"\\'").replace(/\\/g,'\\\\');
+    }
+
+    function verifyPassword() {
+      var passInput = document.getElementById('passwordInput');
+      if (passInput && passInput.value.trim() === CORRECT_PASSWORD) {
+        localStorage.setItem('bfLoggedIn', 'true');
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('portalScreen').style.display = 'flex';
+        fullSync();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    }
+    document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') verifyPassword();
+    });
+
+    function logout() {
+      localStorage.removeItem('bfLoggedIn');
+      document.getElementById('appContent').style.display = 'none';
+      document.getElementById('portalScreen').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('loginError').style.display = 'none';
+      document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+      currentPortal = '';
+    }
+
+    function showToast(msg) {
+      var toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.style.visibility = "visible";
+      setTimeout(function() { toast.style.visibility = "hidden"; }, 4000);
+    }
+
+    function showPortalHub() {
+      document.getElementById('appContent').style.display = 'none';
+      document.getElementById('portalScreen').style.display = 'flex';
+    }
+
+    function enterPortal(portalType) {
+      currentPortal = portalType;
+      document.getElementById('portalScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+      document.getElementById('nav-prop').style.display = portalType === 'prop' ? 'block' : 'none';
+      document.getElementById('nav-sme').style.display = portalType === 'sme' ? 'block' : 'none';
+      document.getElementById('appTitle').innerText = 'BridgFunder London Lead Management';
+      if (portalType === 'prop') switchView('prop-dashboard', document.querySelectorAll('#nav-prop button')[0]);
+      else switchView('sme-dashboard', document.querySelectorAll('#nav-sme button')[0]);
+    }
+
+    function fullSync() {
+      showToast("Syncing databases securely...");
+      google.script.run.withSuccessHandler(function(s) {
+        if(document.getElementById('stat-total')) document.getElementById('stat-total').innerText = (s.total || 0).toLocaleString();
+        if(document.getElementById('stat-dev')) document.getElementById('stat-dev').innerText = (s.dev || 0).toLocaleString();
+        if(document.getElementById('stat-land')) document.getElementById('stat-land').innerText = (s.landlord || 0).toLocaleString();
+        if(document.getElementById('stat-charges')) document.getElementById('stat-charges').innerText = (s.charges || 0).toLocaleString();
+        if(document.getElementById('stat-target')) document.getElementById('stat-target').innerText = (s.target || 0).toLocaleString();
+        if(document.getElementById('stat-review')) document.getElementById('stat-review').innerText = (s.review || 0).toLocaleString();
+        if(document.getElementById('stat-exclude')) document.getElementById('stat-exclude').innerText = (s.exclude || 0).toLocaleString();
+        if(document.getElementById('stat-updated')) document.getElementById('stat-updated').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      }).getDatabaseStats();
+
+      google.script.run.withSuccessHandler(function(data) { globalLeads = data; applyPropFilters(); }).getLeads();
+      google.script.run.withSuccessHandler(function(data) { globalCharges = data; applyChargeFilters(); renderPropAnalysis(); }).getChargesList();
+      google.script.run.withSuccessHandler(function(s) {
+        if(document.getElementById('stat-charge-total')) document.getElementById('stat-charge-total').innerText = (s.total || 0).toLocaleString();
+        if(document.getElementById('stat-charge-active')) document.getElementById('stat-charge-active').innerText = (s.active || 0).toLocaleString();
+        if(document.getElementById('stat-charge-prop')) document.getElementById('stat-charge-prop').innerText = (s.property || 0).toLocaleString();
+        if(document.getElementById('stat-charge-comps')) document.getElementById('stat-charge-comps').innerText = (s.companies || 0).toLocaleString();
+      }).getChargesStats();
+      google.script.run.withSuccessHandler(function(data) {
+        globalSMEs = data;
+        if(document.getElementById('sme-stat-total')) document.getElementById('sme-stat-total').innerText = globalSMEs.length;
+        if(document.getElementById('sme-stat-high')) document.getElementById('sme-stat-high').innerText = globalSMEs.filter(s => s['SME Priority'] === 'High').length;
+        if(document.getElementById('sme-stat-med')) document.getElementById('sme-stat-med').innerText = globalSMEs.filter(s => s['SME Priority'] === 'Medium').length;
+        if(document.getElementById('sme-stat-overdue')) document.getElementById('sme-stat-overdue').innerText = globalSMEs.filter(s => s['Accounts Status'] === 'Overdue').length;
+        applySmeFilters(); renderSmeAnalysis();
+      }).getSmesList();
+      fetchOutreachTargets();
+      loadTemplateOptions();
+    }
+
+    function switchView(viewId, btn) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      var targetEl = document.getElementById(viewId);
+      if (targetEl) targetEl.classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (viewId === 'prop-dashboard') {
+        google.script.run.withSuccessHandler(function(s) {
+          if(document.getElementById('stat-updated')) document.getElementById('stat-updated').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        }).getDatabaseStats();
+      } else if (viewId === 'prop-leads') { applyPropFilters(); }
+      else if (viewId === 'prop-charges') { applyChargeFilters(); }
+      else if (viewId === 'prop-analysis') { renderPropAnalysis(); }
+      else if (viewId === 'sme-leads') { applySmeFilters(); }
+      else if (viewId === 'sme-analysis') { renderSmeAnalysis(); }
+      else if (viewId === 'outreach-hub') { fetchOutreachTargets(); }
+    }
+
+    // ========== OUTREACH HUB ==========
+    function fetchOutreachTargets() {
+      google.script.run.withSuccessHandler(function(data) {
+        globalTargets = data;
+        applyOutreachFilters();
+      }).getTopTargetsList();
+    }
+
+    function applyOutreachFilters() {
+      var searchTerm = (document.getElementById('outreachSearchInput')?.value || '').toLowerCase().trim();
+      var column = document.getElementById('outreachSearchColumn')?.value || 'all';
+
+      var filtered = globalTargets.filter(function(lead) {
+        if (!searchTerm) return true;
+
+        var match = false;
+        var targetCompany = (lead['Company Name'] || '').toLowerCase();
+        var sectorType = ((lead['SME Sector'] || '') + ' ' + (lead['Classification'] || '')).toLowerCase();
+        var contactName = (lead['Contact Name'] || '').toLowerCase();
+        var emailAddress = (lead['Email'] || '').toLowerCase();
+        var verifiedSocial = '';
+        ['Website','LinkedIn','LinkedIn URL','Instagram','TikTok','X (Twitter)','Facebook','YouTube'].forEach(function(key) {
+          if (lead[key]) verifiedSocial += lead[key].toLowerCase() + ' ';
+        });
+        var pipelineStatus = (lead['Lead Status'] || lead['Pipeline Status'] || '').toLowerCase();
+
+        switch(column) {
+          case 'targetCompany': match = targetCompany.includes(searchTerm); break;
+          case 'sectorType': match = sectorType.includes(searchTerm); break;
+          case 'contactName': match = contactName.includes(searchTerm); break;
+          case 'emailAddress': match = emailAddress.includes(searchTerm); break;
+          case 'verifiedSocial': match = verifiedSocial.includes(searchTerm); break;
+          case 'pipelineStatus': match = pipelineStatus.includes(searchTerm); break;
+          default:
+            match = targetCompany.includes(searchTerm) ||
+                    sectorType.includes(searchTerm) ||
+                    contactName.includes(searchTerm) ||
+                    emailAddress.includes(searchTerm) ||
+                    verifiedSocial.includes(searchTerm) ||
+                    pipelineStatus.includes(searchTerm);
+        }
+        return match;
+      });
+
+      renderOutreachTable(filtered);
+    }
+
+    function renderOutreachTable(data) {
+      var tbody = document.querySelector('#outreachTable tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      data.forEach(function(lead) {
+        var companyNumber = escJsAndHtml(lead['Company Number']);
+        var companyName = escJsAndHtml(lead['Company Name']);
+        var email = escJsAndHtml(lead['Email']);
+        var contactName = escJsAndHtml(lead['Contact Name']);
+        var classification = escJsAndHtml(lead['Classification'] || '');
+        var smeSector = escJsAndHtml(lead['SME Sector'] || '');
+        var website = escJsAndHtml(lead['Website'] || '');
+        var linkedin = escJsAndHtml(lead['LinkedIn URL'] || lead['LinkedIn'] || '');
+        var typeClass = lead['Classification'] === 'SME' ? 'bg-sme' : (lead['Classification'] === 'Developer' ? 'bg-target' : 'bg-review');
+
+        var pipelineStatus = lead['Lead Status'] || lead['Pipeline Status'] || 'New';
+        var statusBdg = '<span class="badge" style="background:#e2e8f0;">' + pipelineStatus + '</span>';
+        if (pipelineStatus === 'Contacted') {
+          statusBdg = '<span class="badge bg-target"><i class="fa-solid fa-check-circle"></i> Contacted</span>';
+        } else if (pipelineStatus === 'In Progress') {
+          statusBdg = '<span class="badge bg-review"><i class="fa-solid fa-spinner"></i> In Progress</span>';
+        } else if (pipelineStatus === 'Converted') {
+          statusBdg = '<span class="badge" style="background:#22c55e; color:white;">Converted</span>';
+        } else if (pipelineStatus === 'Dead') {
+          statusBdg = '<span class="badge bg-exclude">Dead</span>';
+        }
+
+        var socialHtml = '';
+        if (website) socialHtml += '<a href="' + website + '" target="_blank" class="social-icon-btn" title="Website"><i class="fa-solid fa-globe" style="color:#64748b;"></i></a>';
+        if (linkedin) socialHtml += '<a href="' + linkedin + '" target="_blank" class="social-icon-btn" title="LinkedIn Profile"><i class="fa-brands fa-linkedin" style="color:#0a66c2;"></i></a>';
+        if (!socialHtml) socialHtml = '<span style="color:#94a3b8; font-size:0.8rem;">-</span>';
+
+        var deleteBtn = `<button class="btn btn-red" style="padding:0.2rem 0.5rem; font-size:0.8rem; margin-left:5px;" onclick="deleteCompanyRecord('${companyNumber}')" title="Delete Company"><i class="fa-solid fa-trash"></i></button>`;
+
+        tbody.innerHTML += '<tr>' +
+          '<td><input type="checkbox" class="outreach-cb" value="' + companyNumber + '" data-cname="' + companyName + '" data-cemail="' + email + '" data-contact="' + contactName + '"></td>' +
+          '<td><strong>' + companyName + '</strong><br><span style="font-size:0.75rem; color:#64748b;">' + companyNumber + '</span></td>' +
+          '<td><span class="badge ' + typeClass + '">' + (smeSector || classification || 'Target') + '</span></td>' +
+          '<td>' + (contactName || '-') + '</td>' +
+          '<td><strong style="color:var(--navy);">' + (email || '-') + '</strong></td>' +
+          '<td>' + socialHtml + '</td>' +
+          '<td>' + statusBdg + '</td>' +
+          '<td style="white-space: nowrap;">' +
+            '<button class="btn btn-outline" style="padding:0.35rem 0.75rem; font-size:0.8rem;" onclick="openCompanyModal(\'' + companyNumber + '\')"><i class="fa-solid fa-eye"></i> CRM</button> ' +
+            deleteBtn +
+          '</td>' +
+        '</tr>';
+      });
+    }
+
+    function deleteCompanyRecord(companyNumber) {
+      if (!confirm('Are you sure you want to delete this company record? This will remove it from all lead sheets and cannot be undone.')) return;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.success) {
+            showToast('✅ ' + res.message);
+            fetchOutreachTargets();
+            fullSync();
+          } else {
+            showToast('❌ Delete failed: ' + (res.message || 'Unknown error'));
+          }
+        })
+        .withFailureHandler(function(err) {
+          showToast('❌ Delete error: ' + err.message);
+        })
+        .deleteCompanyRecord(companyNumber);
+    }
+
+    function toggleAllOutreachContacts(master) {
+      document.querySelectorAll('#outreachTable tbody .outreach-cb').forEach(cb => cb.checked = master.checked);
+    }
+
+    function startOutreachContactSearch() {
+      if (searchIsRunning) { showToast("Search running..."); return; }
+      var checkboxes = document.querySelectorAll('#outreachTable tbody .outreach-cb:checked');
+      searchQueue = [];
+      checkboxes.forEach(cb => searchQueue.push(cb.value));
+      if (searchQueue.length === 0) { showToast("Please select at least one lead."); return; }
+      searchIsRunning = true;
+      document.getElementById('btnRunContacts').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+      processNextOutreachContact(0, searchQueue.length);
+    }
+
+    function processNextOutreachContact(currentIndex, total) {
+      if (currentIndex >= total) {
+        searchIsRunning = false;
+        document.getElementById('btnRunContacts').innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Extract Contacts (Strict API Mode)';
+        showToast("✅ Strict SPV Resolution Complete!");
+        fullSync();
+        return;
+      }
+      var leadId = searchQueue[currentIndex];
+      showToast("Searching Lead " + (currentIndex+1) + " of " + total + "...");
+      google.script.run
+        .withSuccessHandler(function() { processNextOutreachContact(currentIndex+1, total); })
+        .withFailureHandler(function() { processNextOutreachContact(currentIndex+1, total); })
+        .runBackendContactSearch(leadId);
+    }
+
+    function openEmailDesigner() {
+      var checkboxes = document.querySelectorAll('#outreachTable tbody .outreach-cb:checked');
+      var validLeads = [];
+      checkboxes.forEach(function(cb) {
+        var em = cb.getAttribute('data-cemail');
+        if (em && em !== '-' && em !== 'Not Found' && em !== 'Unsearched') {
+          validLeads.push({ cNum: cb.value, companyName: cb.getAttribute('data-cname'), contactName: cb.getAttribute('data-contact'), email: em });
+        }
+      });
+      window.campaignLeads = validLeads;
+      document.getElementById('emailRecipientCount').value = validLeads.length + " Verified Targets Selected";
+      document.getElementById('emailModal').style.display = 'flex';
+      loadTemplateOptions();
+    }
+
+    function loadEmailTemplate() {
+      var val = document.getElementById('emailTemplateSelect').value;
+      if (!val) { document.getElementById('emailSubject').value=''; document.getElementById('emailBody').value=''; return; }
+      const template = currentTemplates.find(t => t.id === val);
+      if (template) { document.getElementById('emailSubject').value = template.subject; document.getElementById('emailBody').value = template.body; }
+    }
+
+    function previewEmailTemplate() {
+      var subject = document.getElementById('emailSubject').value;
+      var body = document.getElementById('emailBody').value;
+      if (!subject || !body) { showToast("Subject and body are required for preview."); return; }
+      var sampleCompany = "Apex Developments London Ltd";
+      var sampleContact = "Alex Morgan";
+      var previewBody = body.replace(/{{Company Name}}/g, sampleCompany).replace(/{{Contact Name}}/g, sampleContact);
+      var frame = document.getElementById('emailPreviewFrame');
+      frame.srcdoc = previewBody;
+      document.getElementById('emailPreviewModal').style.display = 'flex';
+    }
+
+    function sendTestEmailPreview() {
+      var testTo = document.getElementById('testEmailRecipient').value.trim();
+      var subj = document.getElementById('emailSubject').value.trim();
+      var body = document.getElementById('emailBody').value.trim();
+      if (!testTo || !subj || !body) { showToast("Recipient, subject, and body are required for a test."); return; }
+      var btn = document.getElementById('btnSendTest');
+      btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Test...';
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Live Test';
+          if (res.success) showToast("✅ Test email delivered to " + testTo + "! Check your inbox.");
+          else showToast("❌ Test failed: " + res.message);
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Live Test';
+          showToast("❌ Error: " + err.message);
+        })
+        .sendTestEmail(testTo, subj, body);
+    }
+
+    function sendCampaignEmails() {
+      var subj = document.getElementById('emailSubject').value;
+      var body = document.getElementById('emailBody').value;
+      if (!window.campaignLeads || window.campaignLeads.length === 0) { showToast("No valid leads selected."); return; }
+      if (!subj || !body) { showToast("Subject and body are required."); return; }
+      document.getElementById('btnSendEmails').disabled = true;
+      document.getElementById('emailSendingLoader').style.display = 'block';
+      google.script.run
+        .withSuccessHandler(function(res) {
+          document.getElementById('btnSendEmails').disabled = false;
+          document.getElementById('emailSendingLoader').style.display = 'none';
+          document.getElementById('emailModal').style.display = 'none';
+          showToast("✅ Dispatched " + res.sent + " emails via IONOS alias. CRM logs & Drive folders updated!");
+          fullSync();
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('btnSendEmails').disabled = false;
+          document.getElementById('emailSendingLoader').style.display = 'none';
+          showToast("❌ Error: " + err.message);
+        })
+        .sendCampaignEmail(window.campaignLeads, subj, body);
+    }
+
+    function loadTemplatesList() {
+      google.script.run.withSuccessHandler(function(templates) {
+        currentTemplates = templates;
+        const container = document.getElementById('templateListContainer');
+        if (templates.length === 0) { container.innerHTML = '<p style="color:#64748b;">No templates found. Click "Add New Template" to create one.</p>'; return; }
+        let html = '';
+        templates.forEach(function(template) {
+          html += `<div class="template-card"><div><strong>${template.name}</strong><br><span style="font-size:0.8rem; color:#64748b;">Subject: ${template.subject}</span></div><div class="template-actions"><button class="btn btn-outline" style="padding:0.35rem 0.75rem; font-size:0.8rem;" onclick="openTemplateForm('${template.id}')"><i class="fa-solid fa-pen"></i> Edit</button><button class="btn btn-red" style="padding:0.35rem 0.75rem; font-size:0.8rem;" onclick="deleteTemplateFromManager('${template.id}')"><i class="fa-solid fa-trash"></i> Delete</button></div></div>`;
+        });
+        container.innerHTML = html;
+      }).getTemplatesList();
+    }
+
+    function loadTemplateOptions() {
+      google.script.run.withSuccessHandler(function(templates) {
+        currentTemplates = templates;
+        const select = document.getElementById('emailTemplateSelect');
+        if (!select) return;
+        select.length = 1;
+        templates.forEach(function(template) {
+          const option = document.createElement('option');
+          option.value = template.id;
+          option.textContent = template.name;
+          select.appendChild(option);
+        });
+      }).getTemplatesList();
+    }
+
+    function openTemplateManager() { document.getElementById('templateManagerModal').style.display = 'flex'; loadTemplatesList(); }
+    function closeTemplateManager() { document.getElementById('templateManagerModal').style.display = 'none'; loadTemplateOptions(); }
+    function openTemplateForm(templateId) {
+      currentEditingTemplateId = templateId;
+      if (templateId) {
+        const template = currentTemplates.find(t => t.id === templateId);
+        if (template) {
+          document.getElementById('templateNameInput').value = template.name;
+          document.getElementById('templateSubjectInput').value = template.subject;
+          document.getElementById('templateBodyInput').value = template.body;
+          document.getElementById('templateFormTitle').innerText = 'Edit Template';
+        }
+      } else {
+        document.getElementById('templateNameInput').value = '';
+        document.getElementById('templateSubjectInput').value = '';
+        document.getElementById('templateBodyInput').value = '';
+        document.getElementById('templateFormTitle').innerText = 'Add New Template';
+      }
+      document.getElementById('templateFormModal').style.display = 'flex';
+    }
+    function closeTemplateForm() { document.getElementById('templateFormModal').style.display = 'none'; }
+    function saveTemplateFromForm() {
+      const name = document.getElementById('templateNameInput').value.trim();
+      const subject = document.getElementById('templateSubjectInput').value.trim();
+      const body = document.getElementById('templateBodyInput').value.trim();
+      if (!name || !subject || !body) { showToast("Please fill in all fields."); return; }
+      const templateData = { id: currentEditingTemplateId || null, name: name, subject: subject, body: body };
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) {
+          showToast(res.message);
+          closeTemplateForm();
+          loadTemplatesList();
+          loadTemplateOptions();
+        } else { alert(res.message); }
+      }).saveTemplate(templateData);
+    }
+    function deleteTemplateFromManager(templateId) {
+      if (confirm("Are you sure you want to delete this template?")) {
+        google.script.run.withSuccessHandler(function(res) {
+          if (res.success) { showToast(res.message); loadTemplatesList(); loadTemplateOptions(); }
+          else { alert(res.message); }
+        }).deleteTemplate(templateId);
+      }
+    }
+    function saveAsTemplate() {
+      const name = prompt("Enter a name for this template:");
+      if (!name) return;
+      const subject = document.getElementById('emailSubject').value.trim();
+      const body = document.getElementById('emailBody').value.trim();
+      if (!subject || !body) { showToast("Subject and body are required."); return; }
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) { showToast("Template saved successfully."); loadTemplateOptions(); }
+        else { alert(res.message); }
+      }).saveTemplate({ id: null, name: name, subject: subject, body: body });
+    }
+
+    function openCompanyModal(companyNumber) {
+      var lead = globalTargets.find(l => String(l['Company Number']) === String(companyNumber)) ||
+                 globalSMEs.find(l => String(l['Company Number']) === String(companyNumber)) ||
+                 globalLeads.find(l => String(l['Company Number']) === String(companyNumber));
+      if (!lead) return;
+      var isSmeContext = (lead['SME Sector'] !== undefined);
+      var cNum = lead['Company Number'] || companyNumber;
+      document.getElementById('detName').innerText = lead['Company Name'] || 'Unknown';
+      document.getElementById('detNumber').innerText = cNum;
+      document.getElementById('detId').value = cNum;
+      document.getElementById('detIsSme').value = isSmeContext ? 'true' : 'false';
+      document.getElementById('detSector').innerText = lead['SME Sector'] || lead['Classification'] || 'General';
+      document.getElementById('editContactName').value = lead['Contact Name'] || '';
+      document.getElementById('editContactEmail').value = lead['Email'] || '';
+      document.getElementById('editPhone').value = lead['Phone'] || '';
+      document.getElementById('editWebsite').value = lead['Website'] || '';
+      document.getElementById('editLinkedin').value = lead['LinkedIn'] || lead['LinkedIn URL'] || '';
+      document.getElementById('editInstagram').value = lead['Instagram'] || '';
+      document.getElementById('editTiktok').value = lead['TikTok'] || '';
+      document.getElementById('editX').value = lead['X (Twitter)'] || '';
+      document.getElementById('editFacebook').value = lead['Facebook'] || '';
+      document.getElementById('editYoutube').value = lead['YouTube'] || '';
+      document.getElementById('editStatus').value = lead['Lead Status'] || 'New';
+      var fDate = '';
+      if (lead['Follow-up Date']) { try { var d = new Date(lead['Follow-up Date']); if (!isNaN(d.getTime())) fDate = d.toISOString().split('T')[0]; } catch(e){} }
+      document.getElementById('editFollow').value = fDate;
+      var notes = lead['Company Brief'] || lead['AI Summary'] || lead['Notes'] || lead['SME Signals'] || lead['Contact Notes'] || 'No specific notes on file.';
+      document.getElementById('detNotes').innerText = notes;
+      var socialDiv = document.getElementById('detSocialButtons');
+      socialDiv.innerHTML = '<a href="https://www.google.com/search?q=' + encodeURIComponent(lead['Company Name'] + ' contact email website') + '" target="_blank" class="btn btn-outline" style="font-size:0.8rem;"><i class="fa-solid fa-magnifying-glass"></i> Google</a>' +
+        '<a href="https://www.google.com/search?q=' + encodeURIComponent(lead['Company Name'] + ' LinkedIn UK') + '" target="_blank" class="btn btn-outline" style="color:#0a66c2; font-size:0.8rem;"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>' +
+        '<a href="https://find-and-update.company-information.service.gov.uk/company/' + cNum + '" target="_blank" class="btn btn-outline" style="font-size:0.8rem;"><i class="fa-solid fa-up-right-from-square"></i> CH Registry</a>';
+      document.getElementById('filingsListContent').innerHTML = '<p style="font-size:0.85rem; color:#64748b;"><i class="fa-solid fa-spinner fa-spin"></i> Fetching live filing documents...</p>';
+      google.script.run.withSuccessHandler(function(res) {
+        var container = document.getElementById('filingsListContent');
+        if (res.success && res.filings && res.filings.length > 0) {
+          var html = '';
+          res.filings.forEach(function(f) {
+            var pdfBtn = f.pdfUrl ? '<a href="' + f.pdfUrl + '" target="_blank" class="btn btn-red" style="padding:0.2rem 0.5rem; font-size:0.75rem;"><i class="fa-solid fa-file-pdf"></i> PDF</a>' : '';
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; border-bottom:1px solid #e2e8f0; font-size:0.85rem;"><div><strong>' + f.description + '</strong> <span style="color:#64748b;">(' + f.date + ')</span></div><div>' + pdfBtn + '</div></div>';
+          });
+          container.innerHTML = html;
+        } else { container.innerHTML = '<p style="font-size:0.85rem; color:#64748b;">No recent filings found.</p>'; }
+      }).getCompanyLiveFilings(cNum);
+      document.getElementById('detailModal').style.display = 'flex';
+      loadInteractions(cNum);
+      loadChargesForCompany(cNum);
+    }
+
+    function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
+
+    function loadInteractions(cNum) {
+      document.getElementById('interactionFeed').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading history...';
+      google.script.run.withSuccessHandler(function(logs) {
+        var html = '';
+        if(logs.length === 0) html = 'No history logged for this client yet.';
+        else {
+          logs.forEach(function(l) {
+            var fileBtn = l.link && l.link.includes('http') ? '<a href="'+l.link+'" target="_blank" class="badge" style="background:#dbeafe; color:#1e40af; margin-left:10px;"><i class="fa-solid fa-paperclip"></i> View File</a>' : '';
+            html += '<div style="margin-bottom:0.6rem; padding-bottom:0.6rem; border-bottom:1px solid #e2e8f0;"><strong>'+l.date+'</strong> <span style="font-size:0.75rem; color:#94a3b8;">('+l.type+')</span><br> '+l.notes + fileBtn + '</div>';
+          });
+        }
+        document.getElementById('interactionFeed').innerHTML = html;
+      }).getInteractions(cNum);
+    }
+
+    function saveInteractionLog() {
+      var btn = document.getElementById('btnUploadFile');
+      var cNum = document.getElementById('detId').value;
+      var cName = document.getElementById('detName').innerText;
+      var notes = document.getElementById('newLogNote').value.trim();
+      var fileInput = document.getElementById('fileUpload');
+      if(!notes && (!fileInput.files || fileInput.files.length === 0)) return alert("Please type a note or attach a file.");
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+      btn.disabled = true;
+      if(fileInput.files && fileInput.files.length > 0) {
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var base64Data = e.target.result.split(',')[1];
+          google.script.run.withSuccessHandler(function(res) {
+            if(res.success) {
+              google.script.run.withSuccessHandler(function(){
+                document.getElementById('newLogNote').value = ''; fileInput.value = '';
+                btn.innerHTML = '<i class="fa-solid fa-upload"></i> Save Note & Upload'; btn.disabled = false;
+                loadInteractions(cNum); showToast("✅ File Uploaded & Saved to Drive!");
+              }).logInteraction(cNum, cName, "File Upload", notes ? notes : "Uploaded file: " + res.fileName, res.fileUrl);
+            } else {
+              alert("File upload failed.");
+              btn.innerHTML = '<i class="fa-solid fa-upload"></i> Save Note & Upload'; btn.disabled=false;
+            }
+          }).uploadFileToDrive(cNum, cName, base64Data, file.name, file.type);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        google.script.run.withSuccessHandler(function(){
+          document.getElementById('newLogNote').value = '';
+          btn.innerHTML = '<i class="fa-solid fa-upload"></i> Save Note & Upload'; btn.disabled = false;
+          loadInteractions(cNum); showToast("✅ Note Saved!");
+        }).logInteraction(cNum, cName, "Manual Note", notes, "");
+      }
+    }
+
+    function saveLeadUpdates() {
+      var btn = document.getElementById('btnSaveCrm');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+      btn.disabled = true;
+      var id = document.getElementById('detId').value;
+      var isSME = document.getElementById('detIsSme').value === 'true';
+      var updates = {
+        status: document.getElementById('editStatus').value,
+        followUp: document.getElementById('editFollow').value,
+        contactName: document.getElementById('editContactName').value,
+        email: document.getElementById('editContactEmail').value,
+        phone: document.getElementById('editPhone').value,
+        website: document.getElementById('editWebsite').value,
+        linkedin: document.getElementById('editLinkedin').value,
+        instagram: document.getElementById('editInstagram').value,
+        tiktok: document.getElementById('editTiktok').value,
+        xPlatform: document.getElementById('editX').value,
+        facebook: document.getElementById('editFacebook').value,
+        youtube: document.getElementById('editYoutube').value
+      };
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.innerHTML = 'Save CRM Record'; btn.disabled = false;
+          if (res.success) {
+            showToast("✅ " + res.message);
+            closeModal();
+            fullSync();
+          } else {
+            alert("❌ Save failed: " + (res.message || 'Unknown error'));
+          }
+        })
+        .withFailureHandler(function(err) {
+          btn.innerHTML = 'Save CRM Record'; btn.disabled = false;
+          alert("❌ Backend error: " + err.message);
+        })
+        .updateLeadRecord(id, isSME, updates);
+    }
+
+    function loadChargesForCompany(cNum) {
+      var container = document.getElementById('chargesListContainer');
+      container.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading charges...';
+      google.script.run.withSuccessHandler(function(charges) {
+        currentChargesForCompany = charges;
+        if (charges.length === 0) { container.innerHTML = '<p>No charges recorded for this company.</p>'; return; }
+        var html = '<table><tr><th>Date</th><th>Lender</th><th>Classification</th><th>Security Asset</th><th>Status</th><th>Actions</th></tr>';
+        charges.forEach(function(c) {
+          var desc = c['Brief Description'] || '';
+          var shortDesc = desc.length > 30 ? desc.substring(0, 30) + '...' : desc;
+          html += '<tr>' +
+            '<td>' + (c['Registration Date'] || '') + '</td>' +
+            '<td>' + (c['Lender'] || '') + '</td>' +
+            '<td>' + (c['Classification'] || '') + '</td>' +
+            '<td title="' + desc.replace(/"/g, '&quot;') + '">' + shortDesc + '</td>' +
+            '<td>' + (c['Status'] || '') + '</td>' +
+            '<td>' +
+              '<button class="btn btn-outline" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="openChargeForm(\'' + c['Charge ID'] + '\')"><i class="fa-solid fa-pen"></i></button> ' +
+              '<button class="btn btn-red" style="padding:0.2rem 0.5rem; font-size:0.75rem;" onclick="deleteCharge(\'' + c['Charge ID'] + '\')"><i class="fa-solid fa-trash"></i></button>' +
+            '</td>' +
+          '</tr>';
+        });
+        html += '</table>';
+        container.innerHTML = html;
+      }).getChargesByCompany(cNum);
+    }
+
+    function openChargeForm(chargeId) {
+      currentEditingChargeId = chargeId;
+      if (chargeId) {
+        var c = currentChargesForCompany.find(x => x['Charge ID'] === chargeId);
+        if (c) {
+          document.getElementById('chargeRegDate').value = c['Registration Date'] || '';
+          document.getElementById('chargeLender').value = c['Lender'] || '';
+          document.getElementById('chargeClassification').value = c['Classification'] || '';
+          document.getElementById('chargeBriefDesc').value = c['Brief Description'] || '';
+          document.getElementById('chargePdfLink').value = c['PDF Link'] || '';
+          document.getElementById('chargeLink').value = c['Charge Link'] || '';
+          document.getElementById('chargeFormTitle').innerText = 'Edit Charge';
+        }
+      } else {
+        document.getElementById('chargeRegDate').value = '';
+        document.getElementById('chargeLender').value = '';
+        document.getElementById('chargeClassification').value = '';
+        document.getElementById('chargeBriefDesc').value = '';
+        document.getElementById('chargePdfLink').value = '';
+        document.getElementById('chargeLink').value = '';
+        document.getElementById('chargeFormTitle').innerText = 'Add Charge';
+      }
+      document.getElementById('chargeFormModal').style.display = 'flex';
+    }
+
+    function closeChargeForm() { document.getElementById('chargeFormModal').style.display = 'none'; }
+
+    function saveChargeForm() {
+      var cNum = document.getElementById('detId').value;
+      var cName = document.getElementById('detName').innerText;
+      var chargeData = {
+        chargeId: currentEditingChargeId || null,
+        companyNumber: cNum,
+        companyName: cName,
+        registrationDate: document.getElementById('chargeRegDate').value,
+        lender: document.getElementById('chargeLender').value,
+        classification: document.getElementById('chargeClassification').value,
+        briefDescription: document.getElementById('chargeBriefDesc').value,
+        pdfLink: document.getElementById('chargePdfLink').value,
+        chargeLink: document.getElementById('chargeLink').value,
+        status: 'OUTSTANDING',
+        isProperty: 'FALSE',
+        isActive: 'TRUE',
+        amount: ''
+      };
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success) {
+          showToast(res.message);
+          closeChargeForm();
+          loadChargesForCompany(cNum);
+        } else { alert(res.message); }
+      }).saveCharge(chargeData);
+    }
+
+    function deleteCharge(chargeId) {
+      if (confirm('Are you sure you want to delete this charge?')) {
+        google.script.run.withSuccessHandler(function(res) {
+          showToast(res.message);
+          loadChargesForCompany(document.getElementById('detId').value);
+        }).deleteCharge(chargeId);
+      }
+    }
+
+    function batchRefresh() {
+      showToast("Refreshing up to 20 companies...");
+      google.script.run.withSuccessHandler(function(res) {
+        showToast(res.message);
+        fullSync();
+      }).batchRefreshCompanies();
+    }
+
+    function refreshSingleCompany() {
+      var cNum = document.getElementById('detId').value;
+      if (!cNum) return;
+      showToast("Refreshing company data...");
+      google.script.run.withSuccessHandler(function(res) {
+        showToast(res.message);
+        fullSync();
+      }).refreshCompanyData(cNum);
+    }
+
+    function generateAI() {
+      var cNum = document.getElementById('detId').value;
+      if (!cNum) return;
+      showToast("Preparing company brief...");
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.success) {
+            document.getElementById('detNotes').innerText = res.summary;
+            showToast("Company brief updated!");
+          } else {
+            var msg = res.message || 'Unknown error';
+            if (res.statusCode) msg += '\n\nStatus Code: ' + res.statusCode;
+            if (res.responseBody) msg += '\n\nAPI Response: ' + res.responseBody;
+            alert('❌ Company Brief Error:\n\n' + msg);
+          }
+        })
+        .withFailureHandler(function(err) {
+          alert('❌ Failed to call backend: ' + err.message);
+        })
+        .generateCompanySummary(cNum);
+    }
+
+    function jumpToFilter(view, type, value) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(view).classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(function(b) {
+        if (view === 'prop-leads' && b.innerText === 'Property Leads') b.classList.add('active');
+        if (view === 'sme-leads' && b.innerText === 'SME Database') b.classList.add('active');
+        if (view === 'prop-charges' && b.innerText === 'Charge Database') b.classList.add('active');
+      });
+      if (view === 'prop-leads') {
+        document.getElementById('filterSector').value = 'ALL';
+        document.getElementById('filterClass').value = 'ALL';
+        document.getElementById('filterCharges').value = 'ALL';
+        document.getElementById('searchInput').value = '';
+        if (type === 'sector') document.getElementById('filterSector').value = value;
+        if (type === 'class') document.getElementById('filterClass').value = value;
+        if (type === 'charges') document.getElementById('filterCharges').value = value;
+        applyPropFilters();
+      } else if (view === 'sme-leads') {
+        document.getElementById('smeFilterSector').value = 'ALL';
+        document.getElementById('smeFilterPriority').value = 'ALL';
+        document.getElementById('smeFilterAccounts').value = 'ALL';
+        document.getElementById('smeSearchInput').value = '';
+        if (type === 'priority') document.getElementById('smeFilterPriority').value = value;
+        if (type === 'accounts') document.getElementById('smeFilterAccounts').value = value;
+        applySmeFilters();
+      } else if (view === 'prop-charges') {
+        document.getElementById('chargeFilterStatus').value = type === 'status' ? value : 'ALL';
+        document.getElementById('chargeFilterType').value = type === 'property' && value === 'TRUE' ? 'PROPERTY' : 'ALL';
+        applyChargeFilters();
+      }
+    }
+
+    function openChargeDescriptionModal(companyNumber, chargeId) {
+      var charge = globalCharges.find(c => String(c['Company Number'] || '').trim() === String(companyNumber).trim() && String(c['Charge ID'] || '').trim() === String(chargeId).trim());
+      if (!charge) charge = globalCharges.find(c => String(c['Company Number'] || '').trim() === String(companyNumber).trim());
+      if (!charge) return;
+      var desc = charge['Brief Description'] || charge['Description'] || charge['Particulars'] || 'No description available.';
+      var lender = charge['Lender'] || charge['Lender Name'] || 'Unknown Lender';
+      var classification = charge['Classification'] || charge['Type'] || 'General Charge';
+      var registrationDate = charge['Registration Date'] || charge['created_on'] || 'N/A';
+      var status = charge['Status'] || (charge['Is Active'] === 'TRUE' ? 'Outstanding' : 'Satisfied');
+      var pdfLink = charge['PDF Link'] || charge['Original Link'] || '';
+      var html = `
+        <div style="margin-bottom: 1.5rem;">
+          <h3 style="color: var(--navy); margin-bottom: 0.5rem;">${charge['Company Name'] || 'Company'}</h3>
+          <p style="font-size:0.9rem; color:#64748b;">Company No: ${companyNumber}</p>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div><strong>Lender:</strong><br>${lender}</div>
+          <div><strong>Classification:</strong><br>${classification}</div>
+          <div><strong>Registration Date:</strong><br>${registrationDate}</div>
+          <div><strong>Status:</strong><br>${status}</div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:1rem;">
+          <strong>Security Asset / Brief Description:</strong>
+          <p style="margin-top:0.5rem; white-space: pre-wrap;">${desc}</p>
+        </div>
+        ${pdfLink ? `<div style="margin-top:1rem;"><a href="${pdfLink}" target="_blank" class="btn btn-red"><i class="fa-solid fa-file-pdf"></i> View Official Charge Document</a></div>` : ''}
+      `;
+      document.getElementById('chargeDescriptionContent').innerHTML = html;
+      document.getElementById('chargeDescriptionModal').style.display = 'flex';
+    }
+
+    function closeChargeDescriptionModal() { document.getElementById('chargeDescriptionModal').style.display = 'none'; }
+
+    function openDrilldown(categoryType, encodedKey) {
+      var key = decodeURIComponent(encodedKey);
+      var results = []; var categoryTitle = "";
+      if (categoryType.indexOf('sme') === 0) {
+        if(categoryType === 'smesector') { categoryTitle = "SME Sector: " + key; results = globalSMEs.filter(s => (s['SME Sector'] || 'Other') === key); }
+        else if(categoryType === 'smeregion') { categoryTitle = "SME Region: " + key; results = globalSMEs.filter(s => getClientRegion(s['Postcode']) === key); }
+        document.getElementById('drilldownHeader').innerHTML = "<th>Company</th><th>Sector</th><th>Trading Years</th><th>Funding Score</th><th>Action</th>";
+        var tbody2 = document.querySelector('#drilldownTable tbody'); tbody2.innerHTML = '';
+        results.forEach(function(lead) {
+          tbody2.innerHTML += "<tr>" +
+            "<td><strong>" + lead['Company Name'] + "</strong><br><span style='font-size:0.8rem; color:#64748b;'>" + lead['Company Number'] + "</span></td>" +
+            "<td><span class='badge bg-sme'>" + (lead['SME Sector'] || 'General') + "</span></td>" +
+            "<td>" + (lead['Trading Years'] || '0') + " Yrs</td>" +
+            "<td>" + (lead['SME Funding Likelihood Score'] || '') + "</td>" +
+            "<td><button class='btn btn-outline' style='padding: 0.35rem 0.75rem; font-size:0.8rem;' onclick=\"openCompanyFromDrilldown('" + lead['Company Number'] + "')\"><i class='fa-solid fa-eye'></i> View Lead</button></td>" +
+            "</tr>";
+        });
+        document.getElementById('drillSubtitle').innerText = "Found " + results.length + " SMEs in this segment.";
+      } else {
+        var activeCharges = globalCharges.filter(c => (String(c['Status']||'').toUpperCase() === 'OUTSTANDING' || String(c['Is Active']||'').toUpperCase() === 'TRUE'));
+        if (categoryType === 'lender') { categoryTitle = "Lender: " + key; results = activeCharges.filter(c => String(c['Lender'] || c['Lender Name'] || c['persons_entitled'] || 'Unknown Lender').toUpperCase().replace(/\s+(PLC|LIMITED|LTD|LLP|BANK PLC|UK PLC)$/i, '').trim() === key); }
+        else if (categoryType === 'region') { categoryTitle = "Region: " + key; results = activeCharges.filter(c => { var leadMatch = globalLeads.find(l => String(l['Company Number']) === String(c['Company Number'])); return (leadMatch ? getClientRegion(leadMatch['Postcode']) : 'Other') === key; }); }
+        else if (categoryType === 'type') { categoryTitle = "Charge Type: " + key; results = activeCharges.filter(c => (c['Classification'] || c['Type'] || c['Charge Type'] || 'General Charge') === key); }
+        else if (categoryType === 'age') {
+          categoryTitle = "Debt Age: " + key;
+          var now = new Date();
+          results = activeCharges.filter(function(c) {
+            var regDateStr = c['Registration Date'] || c['created_on'] || c['Created On'] || c['Date'] || '';
+            if(!regDateStr) return key === 'Unknown';
+            var d = new Date(regDateStr);
+            if(isNaN(d.getTime())) return key === 'Unknown';
+            var diffYrs = (now - d) / (1000 * 60 * 60 * 24 * 365.25);
+            if(diffYrs < 1) return key === '< 1 Year'; if(diffYrs < 3) return key === '1-3 Years'; if(diffYrs < 5) return key === '3-5 Years'; return key === '5+ Years';
+          });
+        }
+        document.getElementById('drilldownHeader').innerHTML = "<th>Company</th><th>Reg. Date</th><th>Lender</th><th>Classification</th><th>Security Asset</th><th>Action</th>";
+        var tbody2 = document.querySelector('#drilldownTable tbody'); tbody2.innerHTML = '';
+        results.forEach(function(chg) {
+          var rawDesc = chg['Brief Description'] || chg['Description'] || chg['Particulars'] || '';
+          if (!rawDesc) {
+            var keys = Object.keys(chg);
+            for(var k=0; k<keys.length; k++) {
+              if (keys[k].toLowerCase().includes('description') || keys[k].toLowerCase().includes('particulars')) {
+                rawDesc = String(chg[keys[k]]);
+                break;
+              }
+            }
+          }
+          if (rawDesc && (rawDesc.trim().startsWith('[') || rawDesc.trim().startsWith('{'))) rawDesc = "Full details available in PDF link";
+          var shortDesc = rawDesc.length > 40 ? rawDesc.substring(0, 40) + '...' : rawDesc;
+          var tooltip = rawDesc ? 'title="' + rawDesc.replace(/"/g, '&quot;') + '"' : '';
+          tbody2.innerHTML += "<tr>" +
+            "<td><strong>" + (chg['Company Name'] || 'Unknown') + "</strong><br><span style='font-size:0.8rem; color:#64748b;'>" + chg['Company Number'] + "</span></td>" +
+            "<td>" + (chg['Registration Date'] || chg['created_on'] || '-') + "</td>" +
+            "<td><span style='font-size:0.85rem; font-weight:600;'>" + (chg['Lender'] || chg['Lender Name'] || '') + "</span></td>" +
+            "<td><span class='badge bg-sme'>" + (chg['Classification'] || chg['Type'] || '') + "</span></td>" +
+            "<td " + tooltip + " style='cursor:help; font-size:0.8rem; color:#64748b;'>" + (shortDesc || '-') + " <button class='security-asset-btn' onclick=\"openChargeDescriptionModal('" + (chg['Company Number'] || '').replace(/'/g, "\\'") + "', '" + (chg['Charge ID'] || '').replace(/'/g, "\\'") + "')\">View</button></td>" +
+            "<td style='white-space: nowrap;'>" +
+            "<button class='btn btn-outline' style='padding: 0.35rem 0.75rem; font-size:0.8rem; margin-right: 4px;' onclick=\"openCompanyFromDrilldown('" + chg['Company Number'] + "')\"><i class='fa-solid fa-eye'></i> View</button>" +
+            "</td>" +
+            "</tr>";
+        });
+        document.getElementById('drillSubtitle').innerText = "Found " + results.length + " active charges matching this filter.";
+      }
+      document.getElementById('drillTitle').innerText = categoryTitle;
+      document.getElementById('drilldownModal').style.display = 'flex';
+    }
+
+    function closeDrilldownModal() { document.getElementById('drilldownModal').style.display = 'none'; }
+    function openCompanyFromDrilldown(companyNumber) { closeDrilldownModal(); setTimeout(function() { openCompanyModal(companyNumber); }, 50); }
+
+    function applyPropFilters() {
+      var search = document.getElementById("searchInput").value.toUpperCase();
+      var sectorFilter = document.getElementById("filterSector").value;
+      var clsFilt = document.getElementById("filterClass").value;
+      var chgFilt = document.getElementById("filterCharges").value;
+      var filtered = globalLeads.filter(function(l) {
+        if (search && !(l['Company Name']||'').toUpperCase().includes(search) && !(l['Postcode']||'').toUpperCase().includes(search)) return false;
+        var sector = (l['Sector Suitability'] || '').toUpperCase();
+        if(sectorFilter === 'TARGET' && sector !== 'TARGET') return false;
+        if(sectorFilter === 'TARGET_REVIEW' && sector !== 'TARGET' && sector !== 'REVIEW') return false;
+        if(sectorFilter === 'REVIEW' && sector !== 'REVIEW') return false;
+        if(sectorFilter === 'EXCLUDE' && sector !== 'EXCLUDE') return false;
+        if (clsFilt !== 'ALL' && !(l['Classification']||'').toLowerCase().includes(clsFilt.toLowerCase())) return false;
+        var u = parseInt(l['Unsatisfied Charges Count'] || 0, 10);
+        if (chgFilt === 'HAS_CHARGES' && u === 0) return false;
+        if (chgFilt === 'NO_CHARGES' && u > 0) return false;
+        return true;
+      });
+      var tbody = document.querySelector('#leadsTable tbody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+      filtered.slice(0, 150).forEach(function(lead) {
+        var u = parseInt(lead['Unsatisfied Charges Count'] || 0, 10);
+        var chgBdg = u > 0 ? '<span class="badge badge-has-charges"><i class="fa-solid fa-triangle-exclamation"></i> ' + u + ' Active</span>' : '<span class="badge badge-no-charges">0 Active</span>';
+        var secClass = 'bg-sme';
+        if (lead['Sector Suitability'] === 'Target') secClass = 'bg-target';
+        else if (lead['Sector Suitability'] === 'Review') secClass = 'bg-review';
+        else if (lead['Sector Suitability'] === 'Exclude') secClass = 'bg-exclude';
+        tbody.innerHTML +=
+          '<tr onclick="openCompanyModal(\'' + lead['Company Number'] + '\')">' +
+          '<td><strong>' + lead['Company Name'] + '</strong><br><span style="font-size:0.8rem; color:#64748b;">' + lead['Company Number'] + '</span></td>' +
+          '<td><span class="badge ' + secClass + '">' + lead['Sector Suitability'] + '</span></td>' +
+          '<td><span class="badge bg-sme">' + lead['Classification'] + '</span></td>' +
+          '<td>' + chgBdg + '</td>' +
+          '<td><span class="badge" style="background:#e2e8f0;">' + (lead['Lead Status'] || 'New') + '</span></td>' +
+          '</tr>';
+      });
+    }
+
+    function applySmeFilters() {
+      var search = document.getElementById("smeSearchInput").value.toUpperCase();
+      var sectorFilter = document.getElementById("smeFilterSector").value;
+      var prioFilter = document.getElementById("smeFilterPriority").value;
+      var accFilter = document.getElementById("smeFilterAccounts").value;
+      var filtered = globalSMEs.filter(function(l) {
+        if (String(l['Classification']).trim().toUpperCase() === 'DEVELOPER' || String(l['Classification']).trim().toUpperCase() === 'LANDLORD') return false;
+        if (search && !(l['Company Name']||'').toUpperCase().includes(search)) return false;
+        if (sectorFilter !== 'ALL' && l['SME Sector'] !== sectorFilter) return false;
+        if (prioFilter !== 'ALL' && l['SME Priority'] !== prioFilter) return false;
+        if (accFilter !== 'ALL' && l['Accounts Status'] !== accFilter) return false;
+        return true;
+      });
+      filtered.sort((a,b) => parseInt(b['SME Funding Likelihood Score']||0) - parseInt(a['SME Funding Likelihood Score']||0));
+      var tbody = document.querySelector('#smeTable tbody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+      filtered.slice(0, 150).forEach(function(lead) {
+        var accBdg = lead['Accounts Status'] === 'Overdue' ? '<span class="badge badge-has-charges">Overdue</span>' : '<span class="badge badge-no-charges">Up to date</span>';
+        var p = lead['SME Priority'];
+        var scoreBdg = p === 'High' ? '<span class="badge" style="background:#22c55e; color:white;">' + lead['SME Funding Likelihood Score'] + ' (High)</span>' : (p === 'Medium' ? '<span class="badge" style="background:#f59e0b; color:white;">' + lead['SME Funding Likelihood Score'] + ' (Med)</span>' : '<span class="badge" style="background:#94a3b8; color:white;">' + lead['SME Funding Likelihood Score'] + ' (Low)</span>');
+        tbody.innerHTML +=
+          '<tr onclick="openCompanyModal(\'' + lead['Company Number'] + '\')">' +
+          '<td><strong>' + lead['Company Name'] + '</strong><br><span style="font-size:0.8rem; color:#64748b;">' + lead['Company Number'] + '</span></td>' +
+          '<td><span class="badge bg-sme"><i class="fa-solid fa-briefcase"></i> ' + (lead['SME Sector'] || 'Other') + '</span></td>' +
+          '<td>' + (lead['Trading Years'] || '0') + ' Yrs</td>' +
+          '<td>' + scoreBdg + '</td>' +
+          '<td>' + accBdg + '</td>' +
+          '<td><span class="badge" style="background:#e2e8f0;">' + (lead['Lead Status'] || 'New') + '</span></td>' +
+          '</tr>';
+      });
+    }
+
+    function applyChargeFilters() {
+      var search = document.getElementById("chargeSearchInput").value.toUpperCase();
+      var statFilt = document.getElementById("chargeFilterStatus").value;
+      var typeFilt = document.getElementById("chargeFilterType").value;
+      var filtered = globalCharges.filter(function(c) {
+        if (search && !(c['Company Name']||'').toUpperCase().includes(search) && !(c['Lender']||'').toUpperCase().includes(search)) return false;
+        if (statFilt !== 'ALL' && (c['Status']||'').toUpperCase() !== statFilt) return false;
+        var cls = (c['Classification']||'').toUpperCase();
+        if (typeFilt === 'PROPERTY' && !cls.includes('PROPERTY') && !cls.includes('MORTGAGE')) return false;
+        if (typeFilt === 'DEBENTURE' && !cls.includes('DEBENTURE')) return false;
+        if (typeFilt === 'ASSET' && !cls.includes('ASSET')) return false;
+        return true;
+      });
+      var tbody = document.querySelector('#chargesTable tbody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+      filtered.slice(0, 150).forEach(function(c) {
+        var statBdg = (c['Status']||'').toUpperCase() === 'OUTSTANDING' ? '<span class="badge-has-charges badge">ACTIVE</span>' : '<span class="badge-no-charges badge">SATISFIED</span>';
+        var rawDesc = c['Brief Description'] || c['Description'] || c['Particulars'] || '';
+        if (!rawDesc) {
+          var keys = Object.keys(c);
+          for(var k=0; k<keys.length; k++) {
+            if (keys[k].toLowerCase().includes('description') || keys[k].toLowerCase().includes('particulars')) {
+              rawDesc = String(c[keys[k]]);
+              break;
+            }
+          }
+        }
+        if (rawDesc && (rawDesc.trim().startsWith('[') || rawDesc.trim().startsWith('{'))) rawDesc = "Full details available in PDF link";
+        var shortDesc = rawDesc.length > 45 ? rawDesc.substring(0, 45) + '...' : rawDesc;
+        var tooltip = rawDesc ? 'title="' + rawDesc.replace(/"/g, '&quot;') + '"' : '';
+        var safeCompanyNumber = (c['Company Number'] || '').replace(/'/g, "\\'");
+        var safeChargeId = (c['Charge ID'] || '').replace(/'/g, "\\'");
+        tbody.innerHTML +=
+          '<tr>' +
+          '<td style="cursor:pointer;" onclick="openCompanyModal(\'' + safeCompanyNumber + '\')"><strong>' + c['Company Name'] + '</strong></td>' +
+          '<td>' + c['Registration Date'] + '</td>' +
+          '<td>' + c['Lender'] + '</td>' +
+          '<td><span class="badge bg-sme">' + c['Classification'] + '</span></td>' +
+          '<td ' + tooltip + ' style="cursor:help; font-size:0.8rem; color:#64748b;">' + (shortDesc || '-') + ' <button class="security-asset-btn" onclick="openChargeDescriptionModal(\'' + safeCompanyNumber + '\', \'' + safeChargeId + '\')">View</button></td>' +
+          '<td>' + statBdg + '</td>' +
+          '<td><a href="' + c['PDF Link'] + '" target="_blank" class="btn btn-red"><i class="fa-solid fa-file-pdf"></i> PDF</a></td>' +
+          '</tr>';
+      });
+    }
+
+    function toggleLendersView() { showAllLenders = !showAllLenders; renderPropAnalysis(); }
+
+    function getClientRegion(postcode) {
+      if (!postcode) return "Unknown";
+      var pc = String(postcode).toUpperCase().trim();
+      if (/^(E|EC|N|NW|SE|SW|W|WC)\d/.test(pc)) return "London";
+      if (/^(BN|BR|CT|DA|GU|KT|ME|MK|OX|PO|RG|RH|SL|SO|TN|TW)\d/.test(pc)) return "South East";
+      if (/^(AL|CB|CM|CO|HP|IP|LU|NR|PE|SG|SS)\d/.test(pc)) return "East of England";
+      if (/^(BL|CH|CW|FY|L|LA|M|OL|PR|SK|WA|WN)\d/.test(pc)) return "North West";
+      if (/^(B|CV|DY|HR|ST|TF|WS|WV)\d/.test(pc)) return "West Midlands";
+      if (/^(BA|BH|BS|DT|EX|GL|PL|SN|TA|TQ|TR)\d/.test(pc)) return "South West";
+      if (/^(BD|DN|HD|HG|HU|HX|LS|S|WF|YO)\d/.test(pc)) return "Yorkshire & Humber";
+      if (/^(DE|LE|LN|NG|NN)\d/.test(pc)) return "East Midlands";
+      if (/^(AB|DD|DG|EH|FK|G|KA|KY|ML|PA|PH)\d/.test(pc)) return "Scotland";
+      if (/^(CF|LD|LL|NP|SA)\d/.test(pc)) return "Wales";
+      if (/^BT\d/.test(pc)) return "Northern Ireland";
+      return "Other";
+    }
+
+    function buildRows(obj, limit, type) {
+      var sorted = Object.keys(obj).map(k => ({name:k, count:obj[k]})).sort((a,b) => b.count - a.count);
+      if(limit) sorted = sorted.slice(0, limit);
+      var max = sorted.length > 0 ? sorted[0].count : 1;
+      return sorted.map(item => {
+        return '<tr class="interactive-row" onclick="openDrilldown(\'' + type + '\', \'' + encodeURIComponent(item.name) + '\')">' +
+          '<td><strong>' + item.name + '</strong> <i class="fa-solid fa-chevron-right" style="font-size:0.75rem; color:#94a3b8; margin-left:5px;"></i></td>' +
+          '<td style="font-weight:600; color:var(--navy);">' + item.count + '</td>' +
+          '<td style="width: 110px;"><div class="bar-bg"><div class="bar-fill" style="width: ' + ((item.count/max)*100) + '%"></div></div></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function renderPropAnalysis() {
+      var tbLenders = document.querySelector('#tableLenders tbody');
+      var tbRegions = document.querySelector('#tableRegions tbody');
+      var tbTypes = document.querySelector('#tableTypes tbody');
+      var tbAge = document.querySelector('#tableAge tbody');
+      if (!globalCharges || globalCharges.length === 0) {
+        if (tbLenders) tbLenders.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">No charge records available</td></tr>';
+        if (tbRegions) tbRegions.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">No charge records available</td></tr>';
+        if (tbTypes) tbTypes.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">No charge records available</td></tr>';
+        if (tbAge) tbAge.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">No charge records available</td></tr>';
+        return;
+      }
+      var lenders = {}; var regions = {}; var types = {};
+      var ages = {'< 1 Year':0, '1-3 Years':0, '3-5 Years':0, '5+ Years':0, 'Unknown':0};
+      var now = new Date();
+      var activeCharges = globalCharges.filter(c => (String(c['Status']||'').toUpperCase() === 'OUTSTANDING' || String(c['Is Active']||'').toUpperCase() === 'TRUE'));
+      var chargesToAnalyze = activeCharges.length > 0 ? activeCharges : globalCharges;
+      chargesToAnalyze.forEach(function(c) {
+        var rawLender = c['Lender'] || c['Lender Name'] || c['persons_entitled'] || 'Unknown Lender';
+        var lender = String(rawLender).toUpperCase().replace(/\s+(PLC|LIMITED|LTD|LLP|BANK PLC|UK PLC)$/i, '').trim();
+        if (!lender) lender = 'Unknown Lender';
+        lenders[lender] = (lenders[lender] || 0) + 1;
+        var rawType = c['Classification'] || c['Type'] || c['Charge Type'] || 'General Charge';
+        var type = String(rawType).trim();
+        if (!type) type = 'General Charge';
+        types[type] = (types[type] || 0) + 1;
+        var regDateStr = c['Registration Date'] || c['created_on'] || c['Created On'] || c['Date'] || '';
+        if (regDateStr) {
+          var d = new Date(regDateStr);
+          if (!isNaN(d.getTime())) {
+            var diffYrs = (now - d) / (1000 * 60 * 60 * 24 * 365.25);
+            if (diffYrs < 1) ages['< 1 Year']++;
+            else if (diffYrs < 3) ages['1-3 Years']++;
+            else if (diffYrs < 5) ages['3-5 Years']++;
+            else ages['5+ Years']++;
+          } else ages['Unknown']++;
+        } else ages['Unknown']++;
+        var cNum = String(c['Company Number'] || c['company_number'] || '').trim();
+        var leadMatch = globalLeads.find(l => String(l['Company Number'] || '').trim() === cNum);
+        var region = leadMatch ? getClientRegion(leadMatch['Postcode']) : 'Other';
+        regions[region] = (regions[region] || 0) + 1;
+      });
+      var sortedLenders = Object.keys(lenders).map(k => ({name:k, count:lenders[k]})).sort((a,b) => b.count - a.count);
+      if (tbLenders) {
+        var titleEl = document.getElementById('lenderTableTitle');
+        if (titleEl) titleEl.innerHTML = showAllLenders ? '<i class="fa-solid fa-building-columns"></i> All Active Lenders (' + sortedLenders.length + ')' : '<i class="fa-solid fa-building-columns"></i> Top 10 Active Lenders';
+        var toggleBtn = document.getElementById('btnToggleLenders');
+        if (toggleBtn) toggleBtn.innerHTML = showAllLenders ? '<i class="fa-solid fa-compress"></i> Show Top 10 Only' : '<i class="fa-solid fa-list-ul"></i> View All Lenders (' + sortedLenders.length + ')';
+        tbLenders.innerHTML = buildRows(lenders, showAllLenders ? null : 10, 'lender') || '<tr><td colspan="3" style="text-align:center;">No data</td></tr>';
+      }
+      if (tbRegions) tbRegions.innerHTML = buildRows(regions, null, 'region') || '<tr><td colspan="3" style="text-align:center;">No data</td></tr>';
+      if (tbTypes) tbTypes.innerHTML = buildRows(types, null, 'type') || '<tr><td colspan="3" style="text-align:center;">No data</td></tr>';
+      var maxAge = Math.max.apply(null, Object.keys(ages).map(k => ages[k]));
+      if (maxAge < 1) maxAge = 1;
+      if (tbAge) {
+        tbAge.innerHTML = ['< 1 Year', '1-3 Years', '3-5 Years', '5+ Years', 'Unknown'].map(function(k) {
+          if (ages[k] === 0) return '';
+          return '<tr class="interactive-row" onclick="openDrilldown(\'age\', \'' + encodeURIComponent(k) + '\')">' +
+            '<td><strong>' + k + '</strong> <i class="fa-solid fa-chevron-right" style="font-size:0.75rem; color:#94a3b8; margin-left:5px;"></i></td>' +
+            '<td style="font-weight:600; color:var(--navy);">' + ages[k] + '</td>' +
+            '<td style="width: 110px;"><div class="bar-bg"><div class="bar-fill" style="width: ' + ((ages[k]/maxAge)*100) + '%"></div></div></td>' +
+            '</tr>';
+        }).join('') || '<tr><td colspan="3" style="text-align:center;">No age data</td></tr>';
+      }
+    }
+
+    function renderSmeAnalysis() {
+      var tbSec = document.querySelector('#tableSmeSector tbody');
+      var tbScore = document.querySelector('#tableSmeScore tbody');
+      if (!globalSMEs || globalSMEs.length === 0) {
+        if (tbSec) tbSec.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">No SME data</td></tr>';
+        if (tbScore) tbScore.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">No score data</td></tr>';
+        return;
+      }
+      var smeSectors = {};
+      var smeScores = {'High Priority':0, 'Medium Priority':0, 'Low Priority':0};
+      globalSMEs.forEach(function(s) {
+        var sec = s['SME Sector'] || 'Other';
+        smeSectors[sec] = (smeSectors[sec] || 0) + 1;
+        var p = s['SME Priority'];
+        if (p === 'High') smeScores['High Priority']++;
+        else if (p === 'Medium') smeScores['Medium Priority']++;
+        else smeScores['Low Priority']++;
+      });
+      if (tbSec) tbSec.innerHTML = buildRows(smeSectors, null, 'smesector') || '<tr><td colspan="3" style="text-align:center;">No SME data</td></tr>';
+      var maxScoreCount = Math.max.apply(null, Object.keys(smeScores).map(k => smeScores[k]));
+      if (maxScoreCount < 1) maxScoreCount = 1;
+      if (tbScore) {
+        tbScore.innerHTML = ['High Priority', 'Medium Priority', 'Low Priority'].map(function(k) {
+          if (smeScores[k] === 0) return '';
+          return '<tr class="interactive-row" onclick="openDrilldown(\'smepriority\', \'' + encodeURIComponent(k) + '\')">' +
+            '<td><strong>' + k + '</strong> <i class="fa-solid fa-chevron-right" style="font-size:0.75rem; color:#94a3b8; margin-left:5px;"></i></td>' +
+            '<td style="font-weight:600; color:var(--navy);">' + smeScores[k] + '</td>' +
+            '<td style="width: 110px;"><div class="bar-bg"><div class="bar-fill" style="width: ' + ((smeScores[k]/maxScoreCount)*100) + '%"></div></div></td>' +
+            '</tr>';
+        }).join('') || '<tr><td colspan="3" style="text-align:center;">No score data</td></tr>';
+      }
+    }
+
+    function triggerSearch() {
+      showToast("🔍 Sourcing 100 new active leads from Companies House...");
+      var btn = document.querySelector('button[onclick="triggerSearch()"]');
+      if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching...'; }
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success && res.count > 0) { showToast("✅ Added " + res.count + " new leads! Run 'Deep Enrich'."); fullSync(); }
+        else { showToast("⚠️ No new leads added."); }
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-search"></i> Run New Search'; }
+      }).withFailureHandler(function(err) {
+        showToast("❌ Search failed: " + err.message);
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-search"></i> Run New Search'; }
+      }).runLiveBatchSearch();
+    }
+
+    function triggerDeepEnrich() {
+      showToast("✨ Scanning missing Directors, Charges & Filings...");
+      var btn = document.getElementById('btnEnrich');
+      if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enriching...'; }
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success && res.count > 0) { showToast("✅ Deeply enriched " + res.count + " leads!"); fullSync(); }
+        else { showToast("ℹ️ No leads found that currently need deep enrichment."); }
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Deep Enrich 15 Leads'; }
+      }).withFailureHandler(function(err) {
+        showToast("❌ Enrichment failed: " + err.message);
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Deep Enrich 15 Leads'; }
+      }).runDeepEnrichmentBatch();
+    }
+
+    function triggerSmeSearch() {
+      showToast("🔍 Sourcing 100 new active SMEs...");
+      var btn = document.getElementById('btnSmeSearch');
+      if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching...'; }
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success && res.count > 0) { showToast("✅ Added " + res.count + " new [" + res.sector + "] SMEs!"); fullSync(); }
+        else { showToast("⚠️ No new SMEs added."); }
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-search"></i> Run New SME Search'; }
+      }).withFailureHandler(function(err) {
+        showToast("❌ SME Search failed: " + err.message);
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-search"></i> Run New SME Search'; }
+      }).runLiveSmeBatchSearch();
+    }
+
+    function triggerDeepSmeEnrich() {
+      showToast("✨ Calculating SME Funding Scores (~30s)...");
+      var btn = document.getElementById('btnSmeEnrich');
+      if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enriching...'; }
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success && res.count > 0) { showToast("✅ Deeply enriched " + res.count + " SMEs!"); fullSync(); }
+        else { showToast("ℹ️ No SME leads found that currently need scoring."); }
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Deep Enrich 15 SMEs'; }
+      }).withFailureHandler(function(err) {
+        showToast("❌ SME Enrichment failed: " + err.message);
+        if(btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Deep Enrich 15 SMEs'; }
+      }).runDeepSmeEnrichmentBatch();
+    }
+
+    function exportCSV() {
+      if(globalLeads.length === 0) return alert("No data to export");
+      var headers = Object.keys(globalLeads[0]).join(",");
+      var rows = globalLeads.map(l => Object.values(l).map(v => '"' + (v||'').toString().replace(/"/g,'""') + '"').join(","));
+      var link = document.createElement("a");
+      link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + headers + "\n" + rows.join("\n")));
+      link.setAttribute("download", "BridgFunder_Property_Leads_" + new Date().toISOString().split('T')[0] + ".csv");
+      document.body.appendChild(link); link.click();
+    }
+
+    function exportSmeCSV() {
+      if(globalSMEs.length === 0) return alert("No data to export");
+      var headers = Object.keys(globalSMEs[0]).join(",");
+      var rows = globalSMEs.map(l => Object.values(l).map(v => '"' + (v||'').toString().replace(/"/g,'""') + '"').join(","));
+      var link = document.createElement("a");
+      link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + headers + "\n" + rows.join("\n")));
+      link.setAttribute("download", "BridgFunder_SME_Leads_" + new Date().toISOString().split('T')[0] + ".csv");
+      document.body.appendChild(link); link.click();
+    }
+  </script>
 </body>
 </html>
