@@ -918,37 +918,43 @@
 
     // ========== OUTREACH HUB ==========
     function fetchOutreachTargets() {
-      google.script.run.withSuccessHandler(function(data) {
-        globalTargets = data;
-        applyOutreachFilters();
-      }).getTopTargetsList();
+      google.script.run
+        .withSuccessHandler(function(data) {
+          globalTargets = data;
+          applyOutreachFilters();
+        })
+        .withFailureHandler(function(err) {
+          showToast("❌ Failed to load targets: " + err.message);
+        })
+        .getTopTargetsList();
     }
 
     function applyOutreachFilters() {
-      var searchTerm = (document.getElementById('outreachSearchInput')?.value || '').toLowerCase().trim();
-      var column = document.getElementById('outreachSearchColumn')?.value || 'all';
+      var searchTerm = (document.getElementById('outreachSearchInput') || {}).value || '';
+      searchTerm = searchTerm.toLowerCase().trim();
+      var column = (document.getElementById('outreachSearchColumn') || {}).value || 'all';
 
       var filtered = globalTargets.filter(function(lead) {
         if (!searchTerm) return true;
 
-        var match = false;
         var targetCompany = (lead['Company Name'] || '').toLowerCase();
         var sectorType = ((lead['SME Sector'] || '') + ' ' + (lead['Classification'] || '')).toLowerCase();
         var contactName = (lead['Contact Name'] || '').toLowerCase();
         var emailAddress = (lead['Email'] || '').toLowerCase();
         var verifiedSocial = '';
-        ['Website','LinkedIn','LinkedIn URL','Instagram','TikTok','X (Twitter)','Facebook','YouTube'].forEach(function(key) {
+        ['Website', 'LinkedIn', 'LinkedIn URL', 'Instagram', 'TikTok', 'X (Twitter)', 'Facebook', 'YouTube'].forEach(function(key) {
           if (lead[key]) verifiedSocial += lead[key].toLowerCase() + ' ';
         });
         var pipelineStatus = (lead['Lead Status'] || lead['Pipeline Status'] || '').toLowerCase();
 
-        switch(column) {
-          case 'targetCompany': match = targetCompany.includes(searchTerm); break;
-          case 'sectorType': match = sectorType.includes(searchTerm); break;
-          case 'contactName': match = contactName.includes(searchTerm); break;
-          case 'emailAddress': match = emailAddress.includes(searchTerm); break;
-          case 'verifiedSocial': match = verifiedSocial.includes(searchTerm); break;
-          case 'pipelineStatus': match = pipelineStatus.includes(searchTerm); break;
+        var match = false;
+        switch (column) {
+          case 'targetCompany':   match = targetCompany.includes(searchTerm); break;
+          case 'sectorType':      match = sectorType.includes(searchTerm); break;
+          case 'contactName':     match = contactName.includes(searchTerm); break;
+          case 'emailAddress':    match = emailAddress.includes(searchTerm); break;
+          case 'verifiedSocial':  match = verifiedSocial.includes(searchTerm); break;
+          case 'pipelineStatus':  match = pipelineStatus.includes(searchTerm); break;
           default:
             match = targetCompany.includes(searchTerm) ||
                     sectorType.includes(searchTerm) ||
@@ -967,6 +973,7 @@
       var tbody = document.querySelector('#outreachTable tbody');
       if (!tbody) return;
       tbody.innerHTML = '';
+
       data.forEach(function(lead) {
         var companyNumber = escJsAndHtml(lead['Company Number']);
         var companyName = escJsAndHtml(lead['Company Name']);
@@ -980,22 +987,17 @@
 
         var pipelineStatus = lead['Lead Status'] || lead['Pipeline Status'] || 'New';
         var statusBdg = '<span class="badge" style="background:#e2e8f0;">' + pipelineStatus + '</span>';
-        if (pipelineStatus === 'Contacted') {
-          statusBdg = '<span class="badge bg-target"><i class="fa-solid fa-check-circle"></i> Contacted</span>';
-        } else if (pipelineStatus === 'In Progress') {
-          statusBdg = '<span class="badge bg-review"><i class="fa-solid fa-spinner"></i> In Progress</span>';
-        } else if (pipelineStatus === 'Converted') {
-          statusBdg = '<span class="badge" style="background:#22c55e; color:white;">Converted</span>';
-        } else if (pipelineStatus === 'Dead') {
-          statusBdg = '<span class="badge bg-exclude">Dead</span>';
-        }
+        if (pipelineStatus === 'Contacted') statusBdg = '<span class="badge bg-target"><i class="fa-solid fa-check-circle"></i> Contacted</span>';
+        else if (pipelineStatus === 'In Progress') statusBdg = '<span class="badge bg-review"><i class="fa-solid fa-spinner"></i> In Progress</span>';
+        else if (pipelineStatus === 'Converted') statusBdg = '<span class="badge" style="background:#22c55e; color:white;">Converted</span>';
+        else if (pipelineStatus === 'Dead') statusBdg = '<span class="badge bg-exclude">Dead</span>';
 
         var socialHtml = '';
         if (website) socialHtml += '<a href="' + website + '" target="_blank" class="social-icon-btn" title="Website"><i class="fa-solid fa-globe" style="color:#64748b;"></i></a>';
         if (linkedin) socialHtml += '<a href="' + linkedin + '" target="_blank" class="social-icon-btn" title="LinkedIn Profile"><i class="fa-brands fa-linkedin" style="color:#0a66c2;"></i></a>';
         if (!socialHtml) socialHtml = '<span style="color:#94a3b8; font-size:0.8rem;">-</span>';
 
-        var deleteBtn = `<button class="btn btn-red" style="padding:0.2rem 0.5rem; font-size:0.8rem; margin-left:5px;" onclick="deleteCompanyRecord('${companyNumber}')" title="Delete Company"><i class="fa-solid fa-trash"></i></button>`;
+        var deleteBtn = '<button class="btn btn-red delete-company" data-cnum="' + companyNumber + '" style="padding:0.2rem 0.5rem; font-size:0.8rem; margin-left:5px;" title="Delete Company"><i class="fa-solid fa-trash"></i></button>';
 
         tbody.innerHTML += '<tr>' +
           '<td><input type="checkbox" class="outreach-cb" value="' + companyNumber + '" data-cname="' + companyName + '" data-cemail="' + email + '" data-contact="' + contactName + '"></td>' +
@@ -1006,10 +1008,22 @@
           '<td>' + socialHtml + '</td>' +
           '<td>' + statusBdg + '</td>' +
           '<td style="white-space: nowrap;">' +
-            '<button class="btn btn-outline" style="padding:0.35rem 0.75rem; font-size:0.8rem;" onclick="openCompanyModal(\'' + companyNumber + '\')"><i class="fa-solid fa-eye"></i> CRM</button> ' +
+            '<button class="btn btn-outline view-company" data-cnum="' + companyNumber + '" style="padding:0.35rem 0.75rem; font-size:0.8rem;"><i class="fa-solid fa-eye"></i> CRM</button> ' +
             deleteBtn +
           '</td>' +
         '</tr>';
+      });
+
+      // Attach event listeners via delegation
+      tbody.querySelectorAll('.view-company').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          openCompanyModal(btn.getAttribute('data-cnum'));
+        });
+      });
+      tbody.querySelectorAll('.delete-company').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          deleteCompanyRecord(btn.getAttribute('data-cnum'));
+        });
       });
     }
 
